@@ -49,7 +49,7 @@ fi
 
 echo "Start up the Server"
 echo "-------------------"
-sudo -i -u nmrih /home/nmrih/server/srcds_run \
+/home/nmrih/server/srcds_run \
 	-game nmrih \
 	-insecure \
 	-strictportbind \
