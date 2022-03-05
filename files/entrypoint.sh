@@ -47,10 +47,26 @@ if [ -z "$NMRIH_USERPWD" ]; then
 	passwd -u nmrih
 fi
 
+# Check if steamcmd-Folder is empty and delete it for proper access
+if [ -d /home/nmrih/steamcmd ]; then
+	if [ ! "$(ls -A /home/nmrih/steamcmd)" ]; then
+		rm -vR /home/nmrih/steamcmd
+	fi
+fi
+
+# Check if server-Folder is empty and delete it for proper access
+if [ -d /home/nmrih/server ]; then
+	if [[ ! "$(ls -A /home/nmrih/server)" && ! -d /home/nmrih/server/nmrih ]]; then
+		rm -vR /home/nmrih/server
+	fi
+fi
+
 ###################################
 ######## RUN AS nmrih USER ########
 ###################################
 su - nmrih
+
+
 
 # Download-Steamcmd
 if [ ! -d /home/nmrih/steamcmd ]; then
@@ -74,7 +90,7 @@ if [ -z "$NMRIH_STEAMCMDCHECK" ]; then
 fi
 
 # Install the Game if it's not found
-if [ ! -d /home/nmrih/server ]; then
+if [[ ! -d /home/nmrih/server && ! -d /home/nmrih/server/nmrih ]]; then
 	steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
 fi
 
@@ -93,6 +109,7 @@ if [ -z "$NMRIH_VALIDATECHECK" ]; then
 fi
 
 # Change Ownership of files whenever the container starts
+logout
 if [ -z "$NMRIH_SETPERMS" ]; then
 	if [[ "$NMRIH_SETPERMS" = "true" || "$NMRIH_SETPERMS" = "1" ]]; then
 		chown -vR nmrih:nmrih /home/nmrih
