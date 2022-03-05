@@ -42,7 +42,6 @@ RUN chmod 770 /entrypoint.sh
 RUN sed -i 's/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/usr\/sbin\/nologin/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/bin\/bash/g' /etc/passwd
 
 # User
-USER nmrih
 WORKDIR /home/nmrih
 
 # Exposesection

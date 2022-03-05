@@ -47,6 +47,11 @@ if [ -z "$NMRIH_USERPWD" ]; then
 	passwd -u nmrih
 fi
 
+###################################
+######## RUN AS nmrih USER ########
+###################################
+su - nmrih
+
 # Download-Steamcmd
 if [ ! -d /home/nmrih/steamcmd ]; then
 	mkdir -p /home/nmrih/steamcmd
