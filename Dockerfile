@@ -20,15 +20,16 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN echo "exit 0" > /usr/sbin/policy-rc.d
-RUN dpkg --add-architecture i386
 RUN apt-get -qy update && \
-    apt-get -qy install openssh-server rsync unzip steamcmd && \
+    apt-get -qy install openssh-server rsync unzip steamcmd lib32gcc1 && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
 RUN apt-get -qy upgrade
 RUN mkdir -p /etc/ssh/keyfiles
 RUN rm -v /etc/ssh/sshd_config
+RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - && \
+	cp -R steamcmd.sh /usr/bin/steamcmd
 
 # Copy files
 COPY files/entrypoint.sh /
@@ -43,7 +44,6 @@ RUN sed -i 's/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/usr\/sbin\/nologin/ww
 
 # Exposesection
 EXPOSE 22/tcp
-
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
