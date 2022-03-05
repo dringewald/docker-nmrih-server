@@ -89,20 +89,20 @@ fi
 
 # Install the Game if it's not found
 if [[ ! -d /home/nmrih/server && ! -d /home/nmrih/server/nmrih ]]; then
-	steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
+	steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
 fi
 
 # Update the Game
 if [ -z "$NMRIH_UPDATECHECK" ]; then
 	if [[ "$NMRIH_UPDATECHECK" = "true" || "$NMRIH_UPDATECHECK" = "1" ]]; then
-		steamcmd.sh +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 +quit
+		steamcmd.sh  +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 +quit
 	fi
 fi
 
 # Validate the Game
 if [ -z "$NMRIH_VALIDATECHECK" ]; then
 	if [[ "$NMRIH_VALIDATECHECK" = "true" || "$NMRIH_VALIDATECHECK" = "1" ]]; then
-		steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
+		steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
 	fi
 fi
 
