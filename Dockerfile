@@ -21,7 +21,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN echo "exit 0" > /usr/sbin/policy-rc.d
 RUN apt-get -qy update && \
-    apt-get -qy install openssh-server rsync unzip steamcmd lib32gcc1 && \
+    apt-get -qy install openssh-server rsync unzip lib32gcc1 && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
