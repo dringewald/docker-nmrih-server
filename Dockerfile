@@ -19,10 +19,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Runsection
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN mkdir -p /var/run/php
 RUN echo "exit 0" > /usr/sbin/policy-rc.d
+RUN dpkg --add-architecture i386
 RUN apt-get -qy update && \
-    apt-get -qy install openssh-server rsync unzip && \
+    apt-get -qy install openssh-server rsync unzip steamcmd && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
