@@ -34,6 +34,7 @@ RUN mkdir /opt/nmrih
 # Copy files
 COPY files/entrypoint.sh /
 COPY files/nmrih-setup.sh /opt/nmrih/nmrih-setup.sh
+COPY files/stargame.sh /opt/nmrih/stargame.sh
 COPY files/keyfiles/id_ed25519.pub /etc/ssh/keyfiles/id_ed25519.pub
 COPY files/ssh/sshd_config /etc/ssh/sshd_config
 
