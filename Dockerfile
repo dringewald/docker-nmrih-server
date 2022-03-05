@@ -28,8 +28,6 @@ RUN apt-get -qy update && \
 RUN apt-get -qy upgrade
 RUN mkdir -p /etc/ssh/keyfiles
 RUN rm -v /etc/ssh/sshd_config
-RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - && \
-	cp -R steamcmd.sh /usr/bin/steamcmd
 RUN useradd -ms /bin/bash nmrih
 
 # Copy files
@@ -42,6 +40,10 @@ RUN chmod 770 /entrypoint.sh
 
 # Unlock www-data user
 RUN sed -i 's/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/usr\/sbin\/nologin/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/bin\/bash/g' /etc/passwd
+
+# User
+USER nmrih
+WORKDIR /home/nmrih
 
 # Exposesection
 EXPOSE 22/tcp

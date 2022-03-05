@@ -7,7 +7,7 @@ DEBIAN_PRIORITY=critical
 
 # Update packages at the start of the image to ensure that they are uptodate
 if [ -z "$UPDATEPACKAGES" ]; then
-	if [ "$UPDATEPACKAGES" = "true" ] || [ "$UPDATEPACKAGES" = "1" ]; then	
+	if [[ "$UPDATEPACKAGES" = "true" ] || [ "$UPDATEPACKAGES" = "1" ]]; then	
 		apt-get -qy update
 		apt-get -qy full-upgrade
 	fi
@@ -15,10 +15,10 @@ fi
 
 # Check if Keyfiles are directories and remove them when necessary (could happen when mounted the first time with some Kubernetes-Storages)
 if [ -d /etc/ssh/ssh_host_ed25519_key ]; then
-	rm -vR /etc/ssh/ssh_host_ed25519_key
+	rm -vfR /etc/ssh/ssh_host_ed25519_key
 fi
 if [ -d /etc/ssh/ssh_host_rsa_key ]; then
-	rm -vR /etc/ssh/ssh_host_rsa_key
+	rm -vfR /etc/ssh/ssh_host_rsa_key
 fi
 
 # Generate unique ssh keys for this container (if they are not found)
@@ -47,6 +47,27 @@ if [ -z "$NMRIH_USERPWD" ]; then
 	passwd -u nmrih
 fi
 
+# Download-Steamcmd
+if [ ! -d /home/nmrih/steamcmd ]; then
+	mkdir -p /home/nmrih/steamcmd
+	cd /home/nmrih/steamcmd
+	curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+	mv -v steamcmd.sh steamcmd
+	export $PATH = $PATH:/home/nmrih/steamcmd
+fi
+
+# Update Steamcmd
+if [ -z "$NMRIH_STEAMCMDCHECK" ]; then
+	if [[ "$NMRIH_STEAMCMDCHECK" = "true" ] || [ "$NMRIH_STEAMCMDCHECK" = "1" ]]; then
+		rm -vfR /home/nmrih/steamcmd
+		mkdir -p /home/nmrih/steamcmd
+		cd /home/nmrih/steamcmd
+		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+		mv -v steamcmd.sh steamcmd
+		export $PATH = $PATH:/home/nmrih/steamcmd	
+	fi
+fi
+
 # Install the Game if it's not found
 if [ ! -d /home/nmrih/server ]; then
 	steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
@@ -54,22 +75,22 @@ fi
 
 # Update the Game
 if [ -z "$NMRIH_UPDATECHECK" ]; then
-	if [ "$NMRIH_UPDATECHECK" = "true" ] || [ "$NMRIH_UPDATECHECK" = "1" ]; then
-		steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 +quit
+	if [[ "$NMRIH_UPDATECHECK" = "true" ] || [ "$NMRIH_UPDATECHECK" = "1" ]]; then
+		steamcmd.sh +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 +quit
 	fi
 fi
 
 # Validate the Game
 if [ -z "$NMRIH_VALIDATECHECK" ]; then
-	if [ "$NMRIH_VALIDATECHECK" = "true" ] || [ "$NMRIH_VALIDATECHECK" = "1" ]; then
+	if [[ "$NMRIH_VALIDATECHECK" = "true" ] || [ "$NMRIH_VALIDATECHECK" = "1" ]]; then
 		steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
 	fi
 fi
 
 # Change Ownership of files whenever the container starts
 if [ -z "$NMRIH_SETPERMS" ]; then
-	if [ "$NMRIH_SETPERMS" = "true" ] || [ "$NMRIH_SETPERMS" = "1" ]; then
-		chown -vR nmrih.nmrih /home/nmrih
+	if [[ "$NMRIH_SETPERMS" = "true" ] || [ "$NMRIH_SETPERMS" = "1" ]]; then
+		chown -vR nmrih:nmrih /home/nmrih
 		chmod -vR 0770 /home/nmrih
 	fi
 fi
@@ -82,4 +103,5 @@ chmod -v 0770 /etc/ssh/keyfiles
 chmod -vR 0660 /etc/ssh/keyfiles/*
 
 # Starting up everything
+# sleep for testing
 sleep 3600
