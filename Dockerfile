@@ -32,15 +32,14 @@ RUN useradd -ms /bin/bash nmrih
 
 # Copy files
 COPY files/entrypoint.sh /
+COPY files/nmrih-setup.sh /home/nmrih/nmrih-setup.sh
 COPY files/keyfiles/id_ed25519.pub /etc/ssh/keyfiles/id_ed25519.pub
 COPY files/ssh/sshd_config /etc/ssh/sshd_config
 
 # Set permissions
 RUN chmod 770 /entrypoint.sh
-
-# Unlock www-data user
-RUN sed -i 's/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/usr\/sbin\/nologin/www-data\:x\:33\:33\:www-data\:\/var\/www\:\/bin\/bash/g' /etc/passwd
-
+RUN chown nmrih:nmrih /home/nmrih/nmrih-setup.sh
+RUN chmod 770 /home/nmrih/nmrih-setup.sh
 # User
 WORKDIR /home/nmrih
 
