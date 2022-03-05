@@ -30,6 +30,7 @@ RUN mkdir -p /etc/ssh/keyfiles
 RUN rm -v /etc/ssh/sshd_config
 RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - && \
 	cp -R steamcmd.sh /usr/bin/steamcmd
+RUN useradd -ms /bin/bash nmrih
 
 # Copy files
 COPY files/entrypoint.sh /
