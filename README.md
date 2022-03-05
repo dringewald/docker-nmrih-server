@@ -3,7 +3,7 @@ Dieses Image stellt einen vollfunktionsfähigen No more room in Hell-Server bere
 
 ## Variablen
 |Variable|Wert|Beschreibung|Default|
-| ------------- |:-------------:| -----:|
+| ------------- | ------------- | ------------- | ------------- |
 |UPDATEPACKAGES|true / 1|Aktualisiert beim Starten des Images alle Pakete|Nicht gesetzt|
 |USERPWD|Passwort|Setzt ein Nutzerpasswort für die Nutzung via SFTP|Nicht gesetzt|
 |UPDATECHECK|true / 1|Aktualisiert beim Starten des Images den NMRIH-Server|true|
