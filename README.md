@@ -9,7 +9,6 @@ Dieses Image stellt einen vollfunktionsfähigen No more room in Hell-Server bere
 |UPDATECHECK|true / 1|Aktualisiert beim Starten des Images den NMRIH-Server|true|
 |VALIDATECHECK|true/ 1|Validiert beim Starten des Images die NMRIH-Dateien|Nicht gesetzt|
 |SETPERMS|true / 1|Setzt beim Starten des Images die korrekten Berechtigungen|true|
-| ------------- |:-------------:| -----:|
 |SRCDS_RCONPW|Passwort|Setzt das RCON-Passwort|Nicht gesetzt|
 |SRCDS_PW|Passwort|Setzt ein Server-Passwort|Nicht gesetzt|
 |SRCDS_CLIENT_PORT|Port|Setzt den Client-Port|27010|
