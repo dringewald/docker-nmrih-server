@@ -127,7 +127,8 @@ if [ -z "$NMRIH_NET_PUBLIC_ADDRESS" ]; then
 fi
 
 echo "Start up the Server"
-sudo -E -u nmrih /home/nmrih/server/srcds_run \
+echo "-------------------"
+sudo -i -u nmrih /home/nmrih/server/srcds_run \
 	-game nmrih \
 	-insecure \
 	-strictportbind \
