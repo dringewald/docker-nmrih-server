@@ -38,6 +38,7 @@ build_docker_nmrih:
 
 restart_nmrih_pod:
   stage: restart_pods
+  when: manual
   variables:
     GIT_STRATEGY: none
   script:
