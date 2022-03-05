@@ -66,15 +66,13 @@ fi
 ###################################
 su - nmrih
 
-
-
 # Download-Steamcmd
 if [ ! -d /home/nmrih/steamcmd ]; then
 	mkdir -p /home/nmrih/steamcmd
 	cd /home/nmrih/steamcmd
 	curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 	mv -v steamcmd.sh steamcmd
-	export $PATH = $PATH:/home/nmrih/steamcmd
+	export PATH=$PATH:/home/nmrih/steamcmd
 fi
 
 # Update Steamcmd
