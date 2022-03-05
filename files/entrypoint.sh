@@ -42,11 +42,9 @@ echo "" >> /etc/ssh/sshd_config
 echo "AuthorizedKeysFile /etc/ssh/keyfiles/id_ed25519.pub" >> /etc/ssh/sshd_config
 
 # Check if a User-PW is set
-if [ -z "$USERPWD" ]; then
-	if [ "$USERPWD" = "true" ] || [ "$USERPWD" = "1" ]; then	
-		(echo "${USERPWD}"; echo "${USERPWD}") | passwd nmrih
-		passwd -u nmrih
-	fi
+if [ -z "$NMRIH_USERPWD" ]; then	
+	(echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
+	passwd -u nmrih
 fi
 
 # Install the Game if it's not found
@@ -55,29 +53,29 @@ if [ ! -d /home/nmrih/server ]; then
 fi
 
 # Update the Game
-if [ -z "$UPDATECHECK" ]; then
-	if [ "$UPDATECHECK" = "true" ] || [ "$UPDATECHECK" = "1" ]; then
+if [ -z "$NMRIH_UPDATECHECK" ]; then
+	if [ "$NMRIH_UPDATECHECK" = "true" ] || [ "$NMRIH_UPDATECHECK" = "1" ]; then
 		steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 +quit
 	fi
 fi
 
 # Validate the Game
-if [ -z "$VALIDATECHECK" ]; then
-	if [ "$VALIDATECHECK" = "true" ] || [ "$VALIDATECHECK" = "1" ]; then
+if [ -z "$NMRIH_VALIDATECHECK" ]; then
+	if [ "$NMRIH_VALIDATECHECK" = "true" ] || [ "$NMRIH_VALIDATECHECK" = "1" ]; then
 		steamcmd +login anonymous +force_install_dir /home/nmrih/server +app_update 317670 validate +quit
 	fi
 fi
 
 # Change Ownership of files whenever the container starts
-if [ -z "$CHECKPERMS" ]; then
-	if [ "$CHECKPERMS" = "true" ] || [ "$CHECKPERMS" = "1" ]; then
+if [ -z "$NMRIH_SETPERMS" ]; then
+	if [ "$NMRIH_SETPERMS" = "true" ] || [ "$NMRIH_SETPERMS" = "1" ]; then
 		chown -vR nmrih.nmrih /home/nmrih
 		chmod -vR 0770 /home/nmrih
 	fi
 fi
 
 # Change Ownership of Pubkey
-chown -vR nmrih.root /etc/ssh/keyfiles
+chown -vR nmrih:root /etc/ssh/keyfiles
 
 # Change permissions of Pubkey
 chmod -v 0770 /etc/ssh/keyfiles
