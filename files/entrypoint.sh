@@ -62,7 +62,7 @@ if [ -d /home/nmrih/server ]; then
 fi
 
 # Run some commands as nmrih user
-sudo -i -u nmrih /home/nmrih/nmrih-setup.sh
+sudo -i -u nmrih /opt/nmrih/nmrih-setup.sh
 
 # Last but not Least run Permission Check as root to set correct permissions
 # Change Ownership of files whenever the container starts

@@ -29,6 +29,7 @@ RUN apt-get -qy upgrade
 RUN mkdir -p /etc/ssh/keyfiles
 RUN rm -v /etc/ssh/sshd_config
 RUN useradd -ms /bin/bash nmrih
+RUN mkdir /opt/nmrih
 
 # Copy files
 COPY files/entrypoint.sh /
@@ -38,9 +39,10 @@ COPY files/ssh/sshd_config /etc/ssh/sshd_config
 
 # Set permissions
 RUN chmod 770 /entrypoint.sh
-RUN chown nmrih:nmrih /home/nmrih/nmrih-setup.sh
-RUN chmod 770 /home/nmrih/nmrih-setup.sh
-# User
+RUN chown -vR nmrih:nmrih /opt/nmrih/
+RUN chmod -vR 770 /opt/nmrih/
+
+# Workdir
 WORKDIR /home/nmrih
 
 # Exposesection
