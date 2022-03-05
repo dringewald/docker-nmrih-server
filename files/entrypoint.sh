@@ -69,7 +69,7 @@ if [ -z "$NMRIH_STEAMCMDCHECK" ]; then
 		cd /home/nmrih/steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 		mv -v steamcmd.sh steamcmd
-		export $PATH = $PATH:/home/nmrih/steamcmd	
+		export PATH=$PATH:/home/nmrih/steamcmd	
 	fi
 fi
 
