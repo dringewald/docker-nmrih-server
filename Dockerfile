@@ -21,7 +21,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN echo "exit 0" > /usr/sbin/policy-rc.d
 RUN apt-get -qy update && \
-    apt-get -qy install openssh-server rsync unzip curl lib32gcc1 lib32z1 curl git gdb libc6-i386 lib32stdc++6 lib32tinfo5 tar wget sudo && \
+    apt-get -qy install openssh-server rsync unzip curl lib32gcc1 lib32z1 curl git gdb libc6-i386 lib32stdc++6 tar wget sudo && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
