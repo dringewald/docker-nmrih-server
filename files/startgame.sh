@@ -47,6 +47,7 @@ if [ -z "$NMRIH_NET_PUBLIC_ADDRESS" ]; then
 	export NMRIH_NET_PUBLIC_ADDRESS="0.0.0.0"
 fi
 
+echo "-------------------"
 echo "Start up the Server"
 echo "-------------------"
 /home/nmrih/server/srcds_run \
@@ -64,4 +65,6 @@ echo "-------------------"
 	+net_public_adr $NMRIH_NET_PUBLIC_ADDRESS \
 	-authkey $NMRIH_AUTH_KEY \
 	+sv_setsteamaccount $NMRIH_TOKEN \
+	+sv_password $NMRIH_PW \
+	+rcon_password $NMRIH_RCONPW \
 	$NMRIH_ADDITIONAL_ARGS
