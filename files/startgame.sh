@@ -11,8 +11,8 @@ if [ ! -L /home/nmrih/.steam/sdk32 ]; then
 fi
 
 # Check if Variables are empty
-if [ -z "$NMRIH_NET_PUBLIC_ADDRESS" ]; then
-	export NMRIH_NET_PUBLIC_ADDRESS="0.0.0.0"
+if [ -z "$NMRIH_IP_ADDRESS" ]; then
+	export NMRIH_IP_ADDRESS="0.0.0.0"
 fi
 
 if [ -z "$NMRIH_CLIENT_PORT" ]; then
@@ -54,7 +54,7 @@ echo "-------------------"
 	-game nmrih \
 	-insecure \
 	-strictportbind \
-	-ip $NMRIH_NET_PUBLIC_ADDRESS \
+	-ip $NMRIH_IP_ADDRESS \
 	-port $NMRIH_PORT \
 	+clientport $NMRIH_CLIENT_PORT \
 	+tv_port $NMRIH_TV_PORT \
