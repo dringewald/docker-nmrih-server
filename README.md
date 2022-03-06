@@ -19,7 +19,6 @@ Dieses Image stellt einen vollfunktionsfähigen No more room in Hell-Server bere
 |NMRIH_MAXPLAYERS|Anzahl Spieler (max 8)|Definiert die maximale Anzahl der Spieler auf dem Server|8|
 |NMRIH_STARTMAP|Mapname|Setzt die Startmap|nmo_cabin|
 |NMRIH_REGION|Zahl|Setzt die öffentliche Region|3|
-|NMRIH_HOSTNAME|Hostname|Setzt den Hostnamen des Servers|Nicht gesetzt|
 |NMRIH_TOKEN|Steam Gameserver Login Token|Steamserver-Login-Token für öffentliche Server|Nicht gesetzt|
 |NMRIH_AUTH_KEY|Workshop-Key|Workshop-Key für Dateien aus dem Workshop|Nicht gesetzt|
 |NMRIH_CONFIG_FILE|Config-Datei|Legt den Namen der Config-Datei fest|server.cfg|
