@@ -5,9 +5,68 @@ DEBIAN_FRONTEND=noninteractive
 DEBCONF_NONINTERACTIVE_SEEN=true
 DEBIAN_PRIORITY=critical
 
+# Making sure to preserve env for the nmrih-user for the nmrih variables
+if [[ $(grep -L "NMRIH_UPDATEPACKAGES" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_UPDATEPACKAGES\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_USERPWD" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_USERPWD\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_UPDATECHECK" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_UPDATECHECK\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_VALIDATECHECK" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_VALIDATECHECK\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_SETPERMS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_SETPERMS\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_RCONPW" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_RCONPW\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_PW" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_PW\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_CLIENT_PORT" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_CLIENT_PORT\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_PORT" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_PORT\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_TV_PORT" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_TV_PORT\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_IP_ADDRESS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_IP_ADDRESS\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_NET_PUBLIC_ADDRESS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_NET_PUBLIC_ADDRESS\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_MAXPLAYERS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_MAXPLAYERS\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_STARTMAP" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_STARTMAP\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_REGION" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_REGION\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_TOKEN" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_TOKEN\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_AUTH_KEY" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_AUTH_KEY\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_CONFIG_FILE" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_CONFIG_FILE\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
+fi
+
 # Update packages at the start of the image to ensure that they are uptodate
-if [ ! -z "$UPDATEPACKAGES" ]; then
-	if [[ "$UPDATEPACKAGES" = "true" || "$UPDATEPACKAGES" = "1" ]]; then
+if [ ! -z "$NMRIH_UPDATEPACKAGES" ]; then
+	if [[ "$NMRIH_UPDATEPACKAGES" = "true" || "$NMRIH_UPDATEPACKAGES" = "1" ]]; then
 		apt-get -qy update
 		apt-get -qy full-upgrade
 	fi
@@ -87,65 +146,6 @@ else
 		chown -vR nmrih:nmrih /home/nmrih
 		chmod -vR 0770 /home/nmrih
 	fi
-fi
-
-# Making sure to preserve env for the nmrih-user for the nmrih variables
-if [[ $(grep -L "NMRIH_UPDATEPACKAGES" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_UPDATEPACKAGES\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_USERPWD" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_USERPWD\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_UPDATECHECK" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_UPDATECHECK\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_VALIDATECHECK" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_VALIDATECHECK\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_SETPERMS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_SETPERMS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_RCONPW" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_RCONPW\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_PW" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_PW\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_CLIENT_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_CLIENT_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_TV_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_TV_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_IP_ADDRESS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_IP_ADDRESS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_NET_PUBLIC_ADDRESS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_NET_PUBLIC_ADDRESS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_MAXPLAYERS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_MAXPLAYERS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_STARTMAP" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_STARTMAP\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_REGION" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_REGION\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_TOKEN" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_TOKEN\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_AUTH_KEY" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_AUTH_KEY\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_CONFIG_FILE" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_CONFIG_FILE\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
 fi
 
 # Run the game as nmrih user
