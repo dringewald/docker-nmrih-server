@@ -53,6 +53,8 @@ echo "-------------------"
 /home/nmrih/server/srcds_run \
 	-game nmrih \
 	-insecure \
+	-usercon \
+	-console \
 	-strictportbind \
 	-ip $NMRIH_IP_ADDRESS \
 	-port $NMRIH_PORT \
