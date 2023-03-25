@@ -17,21 +17,24 @@ stages:
 .before_script_build_docker:
   before_script:
     # Sometimes Dind svc seems too long to start and/or dind certs are long to be available on builder
-    - i=0; while [ "$i" -lt 12 ]; do docker info && break; sleep 5; i=$(( i + 1 )) ; done
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+    - mkdir -p /kaniko/.docker
+    - echo $DOCKER_AUTH_CONFIG > /kaniko/.docker/config.json
 
 build_docker_nmrih:
   extends: .before_script_build_docker
   stage: build_docker
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""] 
+  # Build Docker-Image
   script:
-    # Build the Docker Image for the production environment
-    - docker build $dockersubfolder -t $maintainer/$dockerimagename:$version
-    # Push the image to dockerhub
-    - docker push $maintainer/$dockerimagename:$version
-    # Push the image to nexus
-    - docker tag $maintainer/$dockerimagename:$version $hostname/$maintainer/$dockerimagename:$version
-    - docker push $hostname/$maintainer/$dockerimagename:$version
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "$dockerhostname/$maintainer/$dockerimagename:$version"
+      --destination "$hostname/$maintainer/$dockerimagename:$version"
+
   only:
     refs:
       - master
