@@ -32,7 +32,6 @@ build_docker_nmrih:
       /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination "$dockerhostname/$maintainer/$dockerimagename:$version"
       --destination "$hostname/$maintainer/$dockerimagename:$version"
 
   only:
