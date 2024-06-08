@@ -6,6 +6,15 @@ DEBCONF_NONINTERACTIVE_SEEN=true
 DEBIAN_PRIORITY=critical
 
 # Making sure to preserve env for the nmrih-user for the nmrih variables
+if [[ $(grep -L "ENABLESSH" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"ENABLESSH\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "ENABLEROOT" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"ENABLEROOT\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "SSHKEY" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"SSHKEY\"" >> /etc/sudoers
+fi
 if [[ $(grep -L "NMRIH_UPDATEPACKAGES" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_UPDATEPACKAGES\"" >> /etc/sudoers
 fi
@@ -64,6 +73,19 @@ if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
 fi
 
+# Set Timezone
+if [ ! -z "$TZ" ]; then
+    if [ -f "/usr/share/zoneinfo/$TZ" ]; then
+        ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+        echo "Timezone set to $TZ"
+    else
+        echo "Error: Invalid timezone '$TZ'"
+        exit 1
+    fi
+else
+    echo "No timezone specified. Using default."
+fi
+
 # Update packages at the start of the image to ensure that they are uptodate
 if [ ! -z "$NMRIH_UPDATEPACKAGES" ]; then
 	if [[ "$NMRIH_UPDATEPACKAGES" = "true" || "$NMRIH_UPDATEPACKAGES" = "1" ]]; then
@@ -72,43 +94,24 @@ if [ ! -z "$NMRIH_UPDATEPACKAGES" ]; then
 	fi
 fi
 
-# Check if Keyfiles are directories and remove them when necessary (could happen when mounted the first time with some Kubernetes-Storages)
-if [ -d /etc/ssh/ssh_host_ed25519_key ]; then
-	rm -vfR /etc/ssh/ssh_host_ed25519_key
-fi
-if [ -d /etc/ssh/ssh_host_rsa_key ]; then
-	rm -vfR /etc/ssh/ssh_host_rsa_key
-fi
-
-# Generate unique ssh keys for this container (if they are not found)
-if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-	ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
-fi
-if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
-	ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
-fi
-
-# Restrict access from other users
-chmod 600 /etc/ssh/ssh_host_ed25519_key
-chmod 600 /etc/ssh/ssh_host_rsa_key
-
-# Show Keyfile Permission in Log
-ls -hali /etc/ssh/ssh_host_ed25519_key
-ls -hali /etc/ssh/ssh_host_rsa_key
-
-# Add Trusted SSH-Keyfile to Keyfiles
-echo "" >> /etc/ssh/sshd_config
-echo "AuthorizedKeysFile /etc/ssh/keyfiles/id_ed25519.pub" >> /etc/ssh/sshd_config
-
 # Check if a User-PW is set
 if [ -z "$NMRIH_USERPWD" ];
 then
-	export NMRIH_USERPWD=asaferandomstring
-	(echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-	passwd -u nmrih
+  export NMRIH_USERPWD=`tr -dc A-Za-z0-9 </dev/urandom | head -c 16; echo`
+  (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
+  passwd -u nmrih
+  echo "------------------------"
+  echo ""
+  echo "Default Password set to:"
+  echo "${NMRIH_USERPWD}"
+  echo ""
+  echo "Please set a static Password to the variable USERPWD to stop the random generation of a password on every start of the container"
+  echo ""
+  echo "------------------------"
 else
 	(echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
 	passwd -u nmrih
+	echo "Custom Password is set via variable USERPWD"
 fi
 
 # Check if steamcmd-Folder is empty and delete it for proper access
@@ -125,27 +128,102 @@ if [ -d /home/nmrih/server ]; then
 	fi
 fi
 
-# Change Ownership of Pubkey
-chown -vR nmrih:root /etc/ssh/keyfiles
-
-# Change permissions of Pubkey
-chmod -v 0770 /etc/ssh/keyfiles
-chmod -vR 0660 /etc/ssh/keyfiles/*
+# Last but not Least run Permission Check as root to set correct permissions
+# Change Ownership of files whenever the container starts
+if [ ! -z "$NMRIH_FIXPERMS" ];
+then
+  if [[ "$NMRIH_FIXPERMS" = "true" || "$NMRIH_FIXPERMS" = "1" ]]; then
+    chown -vR nmrih:nmrih /home/nmrih /opt/nmrih
+    chmod -vR 770 /home/nmrih /opt/nmrih
+  fi
+fi
 
 # Run some commands as nmrih user
 sudo -i -u nmrih /opt/nmrih/nmrih-setup.sh
 
-# Last but not Least run Permission Check as root to set correct permissions
-# Change Ownership of files whenever the container starts
-if [ -z "$NMRIH_SETPERMS" ];
+# Start SSH if Enabled
+if [ ! -z "$ENABLESSH" ];
 then
-	chown -vR nmrih:nmrih /home/nmrih
-	chmod -vR 0770 /home/nmrih
+  if [[ "$ENABLESSH" = "true" || "$ENABLESSH" = "1" ]]; 
+  then
+    # Check if Keyfiles are directories and remove them when necessary (could happen when mounted the first time with some Kubernetes-Storages)
+    if [ -d /etc/ssh/ssh_host_ed25519_key ]; then
+      rm -vfR /etc/ssh/ssh_host_ed25519_key
+    fi
+    if [ -d /etc/ssh/ssh_host_rsa_key ]; then
+      rm -vfR /etc/ssh/ssh_host_rsa_key
+    fi
+
+    # Generate unique ssh keys for this container, if needed
+    if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
+      ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
+    fi
+    if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+      ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
+    fi
+
+    # Restrict access from other users
+    chmod -v 600 /etc/ssh/ssh_host_ed25519_key
+    chmod -v 600 /etc/ssh/ssh_host_rsa_key
+
+    # Check if keyfiles-dir exists - else create it
+    if [ ! -d "/etc/ssh/keyfiles" ]; then
+      # Create keyfiles dir if not exist
+      mkdir -p /etc/ssh/keyfiles
+    fi
+
+    # Create empty pubkeyfile if not exist
+    if [ ! -f "/etc/ssh/keyfiles/pubkey.pub" ]; then
+      touch /etc/ssh/keyfiles/pubkey.pub
+    fi
+    
+    # Add Pubkey to file, if variable is set
+    if [ ! -z "$SSHKEY" ];
+    then
+      echo "$SSHKEY" >> /etc/ssh/keyfiles/pubkey.pub
+    fi
+    chown -vR nmrih:root /etc/ssh/keyfiles
+    chmod -v 700 /etc/ssh/keyfiles
+    chmod -v 644 /etc/ssh/keyfiles/pubkey.pub
+
+    # Add Trusted SSH-Keyfile to Keyfiles
+    echo "" >> /etc/ssh/sshd_config
+    echo "HostKey /etc/ssh/ssh_host_ed25519_key" >> /etc/ssh/sshd_config
+    echo "HostKey /etc/ssh/ssh_host_rsa_key" >> /etc/ssh/sshd_config
+    echo "AuthorizedKeysFile /etc/ssh/keyfiles/pubkey.pub" >> /etc/ssh/sshd_config
+    # Allow Access as root (disabled on default)
+    if [ -z "$ENABLEROOT" ];
+    then
+      echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+    else
+      if [[ "$ENABLEROOT" = "true" || "$ENABLEROOT" = "1" ]]; 
+      then
+        echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config
+      else
+        echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+      fi
+    fi
+    # Allow Password Auth (disabled on default)
+    if [ -z "$ENABLEPWD" ];
+    then
+      echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+    else
+      if [[ "$ENABLEPWD" = "true" || "$ENABLEPWD" = "1" ]]; 
+      then
+        echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+      else
+        echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+      fi
+    fi
+    # Finally start up service
+    echo "------------------------"
+    /usr/sbin/service ssh start
+  elif [[ "$ENABLESSH" = "false" || "$ENABLESSH" = "0" ]]; 
+  then
+    /usr/sbin/service ssh stop
+  fi
 else
-	if [[ "$NMRIH_SETPERMS" = "true" || "$NMRIH_SETPERMS" = "1" ]]; then
-		chown -vR nmrih:nmrih /home/nmrih
-		chmod -vR 0770 /home/nmrih
-	fi
+  /usr/sbin/service ssh stop
 fi
 
 # Run the game as nmrih user
