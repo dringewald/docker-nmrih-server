@@ -77,9 +77,10 @@ WORKDIR /home/nmrih
 
 # Exposesection
 EXPOSE 22/tcp
+EXPOSE 27010/tcp
+EXPOSE 27015/tcp
+EXPOSE 27015/udp
+EXPOSE 27020/udp
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
-
-# User
-USER nmrih
