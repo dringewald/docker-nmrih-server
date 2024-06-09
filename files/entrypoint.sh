@@ -6,11 +6,17 @@ DEBCONF_NONINTERACTIVE_SEEN=true
 DEBIAN_PRIORITY=critical
 
 # Making sure to preserve env for the nmrih-user for the nmrih variables
+if [[ $(grep -L "TZ" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"TZ\"" >> /etc/sudoers
+fi
 if [[ $(grep -L "ENABLESSH" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"ENABLESSH\"" >> /etc/sudoers
 fi
 if [[ $(grep -L "ENABLEROOT" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"ENABLEROOT\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "ENABLEPWD" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"ENABLEPWD\"" >> /etc/sudoers
 fi
 if [[ $(grep -L "SSHKEY" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"SSHKEY\"" >> /etc/sudoers
@@ -94,24 +100,31 @@ if [ ! -z "$NMRIH_UPDATEPACKAGES" ]; then
 	fi
 fi
 
-# Check if a User-PW is set
-if [ -z "$NMRIH_USERPWD" ];
-then
-  export NMRIH_USERPWD=`tr -dc A-Za-z0-9 </dev/urandom | head -c 16; echo`
-  (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-  passwd -u nmrih
-  echo "------------------------"
-  echo ""
-  echo "Default Password set to:"
-  echo "${NMRIH_USERPWD}"
-  echo ""
-  echo "Please set a static Password to the variable USERPWD to stop the random generation of a password on every start of the container"
-  echo ""
-  echo "------------------------"
+# Check if the Docker secret for NMRIH user password exists
+if [ -f "/run/secrets/nmrih_userpwd" ]; then
+    NMRIH_USERPWD=$(cat /run/secrets/nmrih_userpwd)
+    (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
+    passwd -u nmrih
+    echo "Password for nmrih user set from Docker secret."
 else
-	(echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-	passwd -u nmrih
-	echo "Custom Password is set via variable USERPWD"
+    # Check if a User-PW is set
+    if [ -z "$NMRIH_USERPWD" ]; then
+        NMRIH_USERPWD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16; echo)
+        (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
+        passwd -u nmrih
+        echo "------------------------"
+        echo ""
+        echo "Default Password set to:"
+        echo "${NMRIH_USERPWD}"
+        echo ""
+        echo "Please set a static Password to the variable NMRIH_USERPWD to stop the random generation of a password on every start of the container"
+        echo ""
+        echo "------------------------"
+    else
+        (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
+        passwd -u nmrih
+        echo "Custom Password is set via variable NMRIH_USERPWD"
+    fi
 fi
 
 # Check if steamcmd-Folder is empty and delete it for proper access
@@ -178,9 +191,13 @@ then
     fi
     
     # Add Pubkey to file, if variable is set
-    if [ ! -z "$SSHKEY" ];
-    then
-      echo "$SSHKEY" >> /etc/ssh/keyfiles/pubkey.pub
+    if [ ! -z "$SSHKEY" ]; then
+        mkdir -p /etc/ssh/keyfiles
+        touch /etc/ssh/keyfiles/pubkey.pub
+        IFS=';' read -r -a keys <<< "$SSHKEY"
+        for key in "${keys[@]}"; do
+            echo "$key" >> /etc/ssh/keyfiles/pubkey.pub
+        done
     fi
     chown -vR nmrih:root /etc/ssh/keyfiles
     chmod -v 700 /etc/ssh/keyfiles
