@@ -3,9 +3,11 @@
 ###################################
 ######## RUN AS nmrih USER ########
 ###################################
-if [ "$EUID" -ne 1000 ]
-  then echo "Please run as user \"nmrih\"!"
-  exit
+if [ "$EUID" -ne 1000 ]; then
+    echo "------------------------"
+	echo "Your EUID is $EUID! It should be $(id -u nmrih)"
+	echo "Please run as user \"nmrih\"!"
+	echo "------------------------"
 fi
 
 # Download-Steamcmd

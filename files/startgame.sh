@@ -1,5 +1,17 @@
 #!/bin/bash
 
+###################################
+######## RUN AS nmrih USER ########
+###################################
+
+if [ "$EUID" -ne 1000 ]; then
+    echo "------------------------"
+	echo "Your EUID is $EUID! It should be $(id -u nmrih)"
+	echo "Please run as user \"nmrih\"!"
+	echo "------------------------"
+	exit
+fi
+
 # Check if .steam-Folder exists
 if [ ! -d /home/nmrih/.steam ]; then
 	mkdir -vp /home/nmrih/.steam
