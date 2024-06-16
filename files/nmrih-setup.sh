@@ -11,14 +11,14 @@ if [ "$EUID" -ne 1000 ]; then
 fi
 
 # Download-Steamcmd
-if [ ! -d /home/nmrih/steamcmd ]; then
-	mkdir -p /home/nmrih/steamcmd
-	cd /home/nmrih/steamcmd
-	curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
-	mv -v steamcmd.sh steamcmd
-	if [[ $(grep -L "export PATH" /home/nmrih/.bashrc) ]]; then
-		echo "export PATH=$PATH:/home/nmrih/steamcmd" >> /home/nmrih/.bashrc
-	fi
+if [ ! -d /home/nmrih/steamcmd ] || [ -z "$(ls -A /home/nmrih/steamcmd)" ]; then
+    mkdir -p /home/nmrih/steamcmd
+    cd /home/nmrih/steamcmd
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+    mv -v steamcmd.sh steamcmd
+    if [[ $(grep -L "export PATH" /home/nmrih/.bashrc) ]]; then
+        echo "export PATH=$PATH:/home/nmrih/steamcmd" >> /home/nmrih/.bashrc
+    fi
 fi
 
 # Update Steamcmd
@@ -36,8 +36,8 @@ if [ ! -z "$NMRIH_STEAMCMDCHECK" ]; then
 fi
 
 # Install the Game if it's not found
-if [[ ! -d /home/nmrih/server && ! -d /home/nmrih/server/nmrih ]]; then
-	/home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
+if [ ! -d /home/nmrih/server ] || [ ! -d /home/nmrih/server/nmrih ] || [ -z "$(ls -A /home/nmrih/server/nmrih)" ]; then
+    /home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
 fi
 
 # Update the Game
