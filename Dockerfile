@@ -43,7 +43,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install default packages 
 RUN apt-get -qy update
-RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools
+RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar \
+    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6
 
 # Install OpenSSH Server
 RUN apt-get -qy update && \
