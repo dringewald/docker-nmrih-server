@@ -54,9 +54,6 @@ fi
 if [[ $(grep -L "NMRIH_IP_ADDRESS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_IP_ADDRESS\"" >> /etc/sudoers
 fi
-if [[ $(grep -L "NMRIH_NET_PUBLIC_ADDRESS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_NET_PUBLIC_ADDRESS\"" >> /etc/sudoers
-fi
 if [[ $(grep -L "NMRIH_MAXPLAYERS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_MAXPLAYERS\"" >> /etc/sudoers
 fi

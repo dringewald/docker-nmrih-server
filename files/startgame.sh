@@ -55,10 +55,6 @@ if [ -z "$NMRIH_REGION" ]; then
 	export NMRIH_REGION="3"
 fi
 
-if [ -z "$NMRIH_NET_PUBLIC_ADDRESS" ]; then
-	export NMRIH_NET_PUBLIC_ADDRESS="0.0.0.0"
-fi
-
 echo "-------------------"
 echo "Start up the Server"
 echo "-------------------"
@@ -76,7 +72,6 @@ echo "-------------------"
 	+servercfgfile $NMRIH_CONFIG_FILE \
 	-maxplayers $NMRIH_MAXPLAYERS \
 	+sv_region $NMRIH_REGION \
-	+net_public_adr $NMRIH_NET_PUBLIC_ADDRESS \
 	-authkey $NMRIH_AUTH_KEY \
 	+sv_setsteamaccount $NMRIH_TOKEN \
 	+sv_password $NMRIH_PW \

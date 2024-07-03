@@ -130,7 +130,6 @@ Just include them in you docker run command.
 |NMRIH_PORT|Port|Sets the game port (TCP/UDP)|27015|
 |NMRIH_TV_PORT|Port|Sets the TV port (UDP)|27020|
 |NMRIH_IP_ADDRESS|IP address|IP address to which the server should listen|0.0.0.0|
-|NMRIH_NET_PUBLIC_ADDRESS|IP address|Public IP address of the server|0.0.0.0|
 |NMRIH_MAXPLAYERS|Number of players (max 8)|Defines the maximum number of players on the server|8|
 |NMRIH_STARTMAP|Mapname|Sets the start map|nmo_cabin|
 |NMRIH_REGION|Number|Sets the public region|3|

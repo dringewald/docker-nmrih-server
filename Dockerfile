@@ -1,5 +1,5 @@
 # Use ubuntu as base image for nmrih gameserver
-FROM ubuntu:24.04
+FROM ubuntu:22.04
 
 # Author
 MAINTAINER "Holt | NoX-Eagles.de"
@@ -25,7 +25,6 @@ ENV NMRIH_CLIENT_PORT=27010
 ENV NMRIH_PORT=27015
 ENV NMRIH_TV_PORT=27020
 ENV NMRIH_IP_ADDRESS=0.0.0.0
-ENV NMRIH_NET_PUBLIC_ADDRESS=0.0.0.0
 ENV NMRIH_MAXPLAYERS=8
 ENV NMRIH_STARTMAP=nmo_cabin
 ENV NMRIH_REGION=3
@@ -45,8 +44,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN dpkg --add-architecture i386
 RUN apt-get -qy update
 RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar \
-    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 libncurses5-dev libncursesw5-dev libtinfo6 \
-    libc6:i386 libtinfo6:i386 libstdc++6:i386
+    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 libncurses5-dev libncursesw5-dev libtinfo5 \
+    libc6:i386 libtinfo5:i386 libstdc++6:i386
 
 # Install OpenSSH Server
 RUN apt-get -qy update && \
