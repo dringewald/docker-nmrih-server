@@ -79,7 +79,7 @@ WORKDIR /home/nmrih
 
 # Exposesection
 EXPOSE 22/tcp
-EXPOSE 27010/UDP
+EXPOSE 27010/udp
 EXPOSE 27015/tcp
 EXPOSE 27015/udp
 EXPOSE 27020/udp
