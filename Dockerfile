@@ -55,7 +55,7 @@ RUN apt-get -qy update && \
     rm -f /etc/ssh/ssh_host_*key*
 
 # Add nmrih user and optional directiories - remove ubuntu user
-RUN deluser ubuntu
+# RUN deluser ubuntu
 RUN useradd -ms /bin/bash nmrih
 RUN mkdir -v /opt/nmrih
 
