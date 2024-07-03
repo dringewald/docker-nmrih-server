@@ -41,10 +41,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install default packages 
+# Install default packages
+RUN dpkg --add-architecture i386 
 RUN apt-get -qy update
 RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar \
-    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 lib32tinfo5
+    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 libtinfo5:i386
 
 # Install OpenSSH Server
 RUN apt-get -qy update && \
