@@ -126,9 +126,9 @@ Just include them in you docker run command.
 |NMRIH_SETPERMS|true / 1|Sets the correct permissions when starting the image|false|
 |NMRIH_RCONPW|Password|Sets the RCON password|Not set|
 |NMRIH_PW|Password|Sets a server password|Not set|
-|NMRIH_CLIENT_PORT|Port|Sets the client port|27010|
-|NMRIH_PORT|Port|Sets the game port|27015|
-|NMRIH_TV_PORT|Port|Sets the TV port|27020|
+|NMRIH_CLIENT_PORT|Port|Sets the client port (UDP)|27010|
+|NMRIH_PORT|Port|Sets the game port (TCP/UDP)|27015|
+|NMRIH_TV_PORT|Port|Sets the TV port (UDP)|27020|
 |NMRIH_IP_ADDRESS|IP address|IP address to which the server should listen|0.0.0.0|
 |NMRIH_NET_PUBLIC_ADDRESS|IP address|Public IP address of the server|0.0.0.0|
 |NMRIH_MAXPLAYERS|Number of players (max 8)|Defines the maximum number of players on the server|8|

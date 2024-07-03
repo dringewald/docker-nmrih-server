@@ -44,7 +44,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install default packages 
 RUN apt-get -qy update
 RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar \
-    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6
+    lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 lib32tinfo5
 
 # Install OpenSSH Server
 RUN apt-get -qy update && \
@@ -79,7 +79,7 @@ WORKDIR /home/nmrih
 
 # Exposesection
 EXPOSE 22/tcp
-EXPOSE 27010/tcp
+EXPOSE 27010/UDP
 EXPOSE 27015/tcp
 EXPOSE 27015/udp
 EXPOSE 27020/udp
