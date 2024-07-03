@@ -4,6 +4,7 @@
 DEBIAN_FRONTEND=noninteractive
 DEBCONF_NONINTERACTIVE_SEEN=true
 DEBIAN_PRIORITY=critical
+UBUNTU_VERSION=$(lsb_release -rs)
 
 # Making sure to preserve env for the nmrih-user for the nmrih variables
 if [[ $(grep -L "TZ" /etc/sudoers) ]]; then
@@ -76,17 +77,27 @@ if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
 fi
 
-# Set Timezone
-if [ ! -z "$TZ" ]; then
-    if [ -f "/usr/share/zoneinfo/$TZ" ]; then
-        ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-        echo "Timezone set to $TZ"
+# Function to set timezone
+set_timezone() {
+    if [ ! -z "$TZ" ]; then
+        if [ -f "/usr/share/zoneinfo/$TZ" ]; then
+            ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+            echo "Timezone set to $TZ"
+        else
+            echo "Error: Invalid timezone '$TZ'"
+            exit 1
+        fi
     else
-        echo "Error: Invalid timezone '$TZ'"
-        exit 1
+        echo "No timezone specified. Using default."
     fi
+}
+
+# Main script
+if [[ "$UBUNTU_VERSION" == "24.04" ]] || [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+    set_timezone
 else
-    echo "No timezone specified. Using default."
+    echo "Unsupported Ubuntu version: $UBUNTU_VERSION"
+    exit 1
 fi
 
 # Update packages at the start of the image to ensure that they are uptodate

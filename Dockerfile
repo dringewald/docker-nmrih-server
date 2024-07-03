@@ -43,7 +43,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install default packages
 RUN dpkg --add-architecture i386
 RUN apt-get -qy update
-RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar \
+RUN apt-get -qy install curl ca-certificates software-properties-common dialog apt-utils sudo wget gnupg2 rsync unzip lsof nano net-tools git tar tzdata \
     lib32gcc-s1 lib32z1 gdb libc6-i386 lib32stdc++6 libncurses5-dev libncursesw5-dev libtinfo5 \
     libc6:i386 libtinfo5:i386 libstdc++6:i386
 
