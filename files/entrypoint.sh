@@ -89,8 +89,7 @@ then
     echo 'precedence ::ffff:0:0/96 100' >> /etc/gai.conf
   fi
 fi
-
-if 
+ 
 # Function to set timezone
 set_timezone() {
     if [ ! -z "$TZ" ]; then
