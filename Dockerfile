@@ -63,12 +63,6 @@ RUN mkdir -v /opt/nmrih
 # Upgrade all other packages
 RUN apt-get -qy upgrade
 
-# Disable IPv6 by modifying sysctl configuration
-RUN echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf && \
-    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf && \
-    echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
-RUN sysctl -p
-
 # Create Docker secrets directory
 RUN mkdir -p /run/secrets
 
