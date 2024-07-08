@@ -137,3 +137,4 @@ Just include them in you docker run command.
 |NMRIH_AUTH_KEY|Workshop key|Workshop key for files from the workshop|Not set|
 |NMRIH_CONFIG_FILE|Config file|Determines the name of the config file|server.cfg|
 |NMRIH_ADDITIONAL_ARGS|Other configuration parameters|Determines other, non-existent parameters|Not set|
+|NMRIH_DISABLEIPV6|true/ 1|Disables IPv6|false|
