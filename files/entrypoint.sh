@@ -76,7 +76,24 @@ fi
 if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
 fi
+if [[ $(grep -L "NMRIH_DISABLEIPV6" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_DISABLEIPV6\"" >> /etc/sudoers
+fi
 
+# Disable IPv6
+if [ ! -z "$NMRIH_DISABLEIPV6" ]; 
+then
+  if [ "$NMRIH_DISABLEIPV6" = "true" ] || [ "$NMRIH_DISABLEIPV6" = "1" ]; 
+  then
+    echo "Disabling IPv6..."
+    echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+    echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+    sysctl -p
+  fi
+fi
+
+if 
 # Function to set timezone
 set_timezone() {
     if [ ! -z "$TZ" ]; then
