@@ -86,9 +86,7 @@ then
   if [ "$NMRIH_DISABLEIPV6" = "true" ] || [ "$NMRIH_DISABLEIPV6" = "1" ]; 
   then
     echo "Disabling IPv6..."
-    sysctl -w net.ipv6.conf.all.disable_ipv6=1
-    sysctl -w net.ipv6.conf.default.disable_ipv6=1
-    sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+    echo 'precedence ::ffff:0:0/96 100' >> /etc/gai.conf
   fi
 fi
 
