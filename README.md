@@ -135,5 +135,6 @@ Just include them in you docker run command.
 |NMRIH_REGION|Number|Sets the public region|3|
 |NMRIH_TOKEN|Steam Gameserver Login Token|Steamserver login token for public servers|Not set|
 |NMRIH_AUTH_KEY|Workshop key|Workshop key for files from the workshop|Not set|
+|NMRIH_DISABLEVAC|true / 1|Disables VAC for the server (useful if plugins or mods are being used that could trigger VAC)|false|
 |NMRIH_CONFIG_FILE|Config file|Determines the name of the config file|server.cfg|
 |NMRIH_ADDITIONAL_ARGS|Other configuration parameters|Determines other, non-existent parameters|Not set|

@@ -54,13 +54,16 @@ fi
 if [ -z "$NMRIH_REGION" ]; then
 	export NMRIH_REGION="3"
 fi
+if [ -z "$VACFLAG" ]; then
+	export VACFLAG="-secure"
+fi
 
 echo "-------------------"
 echo "Start up the Server"
 echo "-------------------"
 /home/nmrih/server/srcds_run \
 	-game nmrih \
-	-insecure \
+	$VACFLAG \
 	-usercon \
 	-console \
 	-strictportbind \

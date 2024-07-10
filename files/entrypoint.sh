@@ -76,6 +76,12 @@ fi
 if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
 fi
+if [[ $(grep -L "NMRIH_DISABLEVAC" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_DISABLEVAC\"" >> /etc/sudoers
+fi
+if [[ $(grep -L "VACFLAG" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"VACFLAG\"" >> /etc/sudoers
+fi
 
 # Function to set timezone
 set_timezone() {
@@ -161,6 +167,15 @@ fi
 
 # Run some commands as nmrih user
 sudo -i -u nmrih /opt/nmrih/nmrih-setup.sh
+
+if [ ! -z "$NMRIH_DISABLEVAC"]
+then
+  if [[ "$NMRIH_DISABLEVAC" = "true" || "$NMRIH_DISABLEVAC" = "1" ]];
+    $VACFLAG = "-insecure"
+  else
+    $VACFLAG = "-secure"
+  fi
+fi
 
 # Start SSH if Enabled
 if [ ! -z "$ENABLESSH" ];
