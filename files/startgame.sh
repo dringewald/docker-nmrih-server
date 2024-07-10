@@ -59,9 +59,9 @@ if [ ! -z "$NMRIH_DISABLEVAC"]
 then
   if [[ "$NMRIH_DISABLEVAC" = "true" || "$NMRIH_DISABLEVAC" = "1" ]];
   then
-    $VACFLAG = "-insecure"
+    export $VACFLAG = "-insecure"
   else
-    $VACFLAG = "-secure"
+    export $VACFLAG = "-secure"
   fi
 else 
 	export VACFLAG="-secure"
