@@ -168,16 +168,6 @@ fi
 # Run some commands as nmrih user
 sudo -i -u nmrih /opt/nmrih/nmrih-setup.sh
 
-if [ ! -z "$NMRIH_DISABLEVAC"]
-then
-  if [[ "$NMRIH_DISABLEVAC" = "true" || "$NMRIH_DISABLEVAC" = "1" ]];
-  then
-    $VACFLAG = "-insecure"
-  else
-    $VACFLAG = "-secure"
-  fi
-fi
-
 # Start SSH if Enabled
 if [ ! -z "$ENABLESSH" ];
 then

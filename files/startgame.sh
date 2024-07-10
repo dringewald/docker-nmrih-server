@@ -54,7 +54,16 @@ fi
 if [ -z "$NMRIH_REGION" ]; then
 	export NMRIH_REGION="3"
 fi
-if [ -z "$VACFLAG" ]; then
+
+if [ ! -z "$NMRIH_DISABLEVAC"]
+then
+  if [[ "$NMRIH_DISABLEVAC" = "true" || "$NMRIH_DISABLEVAC" = "1" ]];
+  then
+    $VACFLAG = "-insecure"
+  else
+    $VACFLAG = "-secure"
+  fi
+else 
 	export VACFLAG="-secure"
 fi
 
