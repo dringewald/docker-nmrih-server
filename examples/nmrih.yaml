@@ -1,0 +1,149 @@
+##################################
+############# NMRIH  #############
+######## Dedicated Server ########
+##### Kubernetes Deployment ######
+##################################
+
+# Creates the Namespace "games"
+# Everything related to nmrih will be created into this namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: games
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nmrih
+  namespace: games
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nmrih
+  template:
+    metadata:
+      labels:
+        app: nmrih
+    spec:
+      hostNetwork: true
+      containers:
+      - name: nmrih
+        image: holt31/nmrih-server:latest
+        imagePullPolicy: "Always"
+        tty: true
+        stdin: true
+        ports:
+          - containerPort: 22
+            protocol: TCP
+          - containerPort: 27010
+            protocol: UDP
+          - containerPort: 27015
+            protocol: TCP
+          - containerPort: 27015
+            protocol: UDP
+          - containerPort: 27020
+            protocol: UDP
+        env:
+        - name: TZ
+          value: "Europe/Berlin"
+        - name: NMRIH_USERPWD
+          value: ""
+        - name: NMRIH_FIXPERMS
+          value: "true"
+        - name: SSHKEY
+          value: "ecdsa-sha2-nistp521 AAAAE2... user1@example.com"
+        - name: NMRIH_UPDATEPACKAGES
+          value: "true"
+        - name: NMRIH_UPDATECHECK
+          value: "true"
+        - name: NMRIH_VALIDATECHECK
+          value: "false"
+        - name: NMRIH_SETPERMS
+          value: "true"
+        - name: NMRIH_STARTMAP
+          value: "nmo_lakeside"
+        - name: NMRIH_TOKEN
+          value: ""
+        volumeMounts:
+        - name: nmrih-persistent-storage
+          mountPath: /home/nmrih/server
+          subPath: nmrih/
+        - name: nmrih-persistent-storage
+          mountPath: /home/nmrih/steamcmd
+          subPath: steamcmd/
+      volumes:
+      - name: nmrih-persistent-storage
+        persistentVolumeClaim:
+          claimName: nmrih-storage
+---
+# Creates a nmrih service as a LoadBalancer (don't forget to forward the ports if your cluster runs behind a firewall/router)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nmrih-service
+  namespace: games
+spec:
+  type: LoadBalancer
+  loadBalancerIP: <your ip address>
+  externalTrafficPolicy: Local
+  ports:
+  - name: nmrih-22-tcp
+    port: 22
+    targetPort: 22
+    protocol: TCP
+  - name: nmrih-27010-udp
+    port: 27010
+    targetPort: 27010
+    protocol: UDP
+  - name: nmrih-27015-tcp
+    port: 27015
+    targetPort: 27015
+    protocol: TCP
+  - name: nmrih-27015-udp
+    port: 27015
+    targetPort: 27015
+    protocol: UDP
+  - name: nmrih-27020-udp
+    port: 27020
+    targetPort: 27020
+    protocol: UDP
+  selector:
+    app: nmrih
+---
+# Create a PersistentVolume (The example is using longhorn, feel free to change it to your needs)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nmrih
+  namespace: games
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  csi:
+    driver: driver.longhorn.io
+    fsType: ext4
+    volumeAttributes:
+      numberOfReplicas: "2"
+      staleReplicaTimeout: '30'
+    volumeHandle: nmrih
+  storageClassName: longhorn
+---
+# Create a PersistentVolumeClaim (It should match the infos from your PersistentVolume)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nmrih-storage
+  namespace: games
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: longhorn
+  volumeName: nmrih

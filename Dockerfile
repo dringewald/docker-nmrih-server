@@ -1,8 +1,8 @@
 # Use ubuntu as base image for nmrih gameserver
 FROM ubuntu:22.04
 
-# Author
-MAINTAINER "Holt | NoX-Eagles.de"
+# Author 
+MAINTAINER "Dustin \"Holt\" Ringewald"
 
 # Label
 LABEL version="1.0"

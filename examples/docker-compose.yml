@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  nmrih-server:
+    image: holt31/nmrih-server:latest
+    environment:
+      TZ: 'Europe/Berlin'
+      NMRIH_USERPWD: '<user pwd>'
+      NMRIH_FIXPERMS: 'true'
+      SSHKEY: 'ecdsa-sha2-nistp521 AAAAE2... user1@example.com'
+      NMRIH_UPDATEPACKAGES: 'true'
+      NMRIH_UPDATECHECK: 'true'
+      NMRIH_VALIDATECHECK: 'false'
+      NMRIH_SETPERMS: 'true'
+      NMRIH_STARTMAP: 'nmo_lakeside'
+      NMRIH_TOKEN: ''
+    volumes:
+      - 'nmrih-server:/home/nmrih/server:rw'
+      - 'nmrih-steamcmd:/home/nmrih/steamcmd:rw'
+    secrets:
+     - nmrih_userpwd
+    ports:
+      - 27010:27010/udp
+      - 27015:27015/udp
+      - 27015:27015/tcp
+      - 27020:27020/udp
+
+volumes:
+  nmrih-server: {}
+  nmrih-steamcmd: {}
+
+secrets:
+  nmrih_userpwd:
+    external: true

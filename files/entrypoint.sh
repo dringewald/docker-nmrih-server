@@ -173,35 +173,42 @@ if [ ! -z "$ENABLESSH" ];
 then
   if [[ "$ENABLESSH" = "true" || "$ENABLESSH" = "1" ]]; 
   then
-    # Check if Keyfiles are directories and remove them when necessary (could happen when mounted the first time with some Kubernetes-Storages)
-    if [ -d /etc/ssh/ssh_host_ed25519_key ]; then
-      rm -vfR /etc/ssh/ssh_host_ed25519_key
+    # Check if host-keyfile-dir exists - else create it
+    if [ ! -d "/etc/ssh/host-keyfiles" ]; then
+      # Create host-keyfile dir if not exist
+      mkdir -p /etc/ssh/host-keyfiles
     fi
-    if [ -d /etc/ssh/ssh_host_rsa_key ]; then
-      rm -vfR /etc/ssh/ssh_host_rsa_key
+
+    # Check if Keyfiles are directories and remove them when necessary (could happen when mounted the first time with some Kubernetes-Storages)
+    if [ -d /etc/ssh/host-keyfiles/ssh_host_ed25519_key ]; then
+      rm -vfR /etc/ssh/host-keyfiles/ssh_host_ed25519_key
+    fi
+    if [ -d /etc/ssh/host-keyfiles/ssh_host_rsa_key ]; then
+      rm -vfR /etc/ssh/host-keyfiles/ssh_host_rsa_key
     fi
 
     # Generate unique ssh keys for this container, if needed
-    if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-      ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
+    if [ ! -f /etc/ssh/host-keyfiles/ssh_host_ed25519_key ]; then
+      ssh-keygen -t ed25519 -f /etc/ssh/host-keyfiles/ssh_host_ed25519_key -N ''
     fi
-    if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
-      ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
+    if [ ! -f /etc/ssh/host-keyfiles/ssh_host_rsa_key ]; then
+      ssh-keygen -t rsa -b 4096 -f /etc/ssh/host-keyfiles/ssh_host_rsa_key -N ''
     fi
 
     # Restrict access from other users
-    chmod -v 600 /etc/ssh/ssh_host_ed25519_key
-    chmod -v 600 /etc/ssh/ssh_host_rsa_key
+    chown -vR root:root /etc/ssh/host-keyfiles
+    chmod -vR 700 /etc/ssh/host-keyfiles
+    chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_ed25519_key
+    chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_rsa_key
 
-    # Check if keyfiles-dir exists - else create it
-    if [ ! -d "/etc/ssh/keyfiles" ]; then
-      # Create keyfiles dir if not exist
-      mkdir -p /etc/ssh/keyfiles
+    # Create empty nmrih-keyfiles pubkeyfile if not exist
+    if [ ! -f "/etc/ssh/nmrih-keyfiles/pubkey.pub" ]; then
+      touch /etc/ssh/nmrih-keyfiles/pubkey.pub
     fi
 
-    # Create empty pubkeyfile if not exist
-    if [ ! -f "/etc/ssh/keyfiles/pubkey.pub" ]; then
-      touch /etc/ssh/keyfiles/pubkey.pub
+    # Create empty root-keyfiles pubkeyfile if not exist
+    if [ ! -f "/etc/ssh/root-keyfiles/pubkey.pub" ]; then
+      touch /etc/ssh/root-keyfiles/pubkey.pub
     fi
     
     # Add Pubkey to file, if variable is set
@@ -210,18 +217,27 @@ then
         touch /etc/ssh/keyfiles/pubkey.pub
         IFS=';' read -r -a keys <<< "$SSHKEY"
         for key in "${keys[@]}"; do
-            echo "$key" >> /etc/ssh/keyfiles/pubkey.pub
+            echo "$key" >> /etc/ssh/nmrih-keyfiles/pubkey.pub
+            echo "$key" >> /etc/ssh/root-keyfiles/pubkey.pub
         done
     fi
-    chown -vR nmrih:root /etc/ssh/keyfiles
-    chmod -v 700 /etc/ssh/keyfiles
-    chmod -v 644 /etc/ssh/keyfiles/pubkey.pub
+
+    # Add Ownership and permissions for nmrih
+    chown -vR nmrih:nmrih /etc/ssh/nmrih-keyfiles
+    chmod -v 770 /etc/ssh/nmrih-keyfiles
+    chmod -v 600 /etc/ssh/nmrih-keyfiles/pubkey.pub
+
+    # Add Ownership and permissions for root
+    chown -vR root:root /etc/ssh/root-keyfiles
+    chmod -v 770 /etc/ssh/root-keyfiles
+    chmod -v 600 /etc/ssh/root-keyfiles/pubkey.pub
 
     # Add Trusted SSH-Keyfile to Keyfiles
     echo "" >> /etc/ssh/sshd_config
-    echo "HostKey /etc/ssh/ssh_host_ed25519_key" >> /etc/ssh/sshd_config
-    echo "HostKey /etc/ssh/ssh_host_rsa_key" >> /etc/ssh/sshd_config
+    echo "HostKey /etc/ssh/host-keyfiles/ssh_host_ed25519_key" >> /etc/ssh/sshd_config
+    echo "HostKey /etc/ssh/host-keyfiles/ssh_host_rsa_key" >> /etc/ssh/sshd_config
     echo "AuthorizedKeysFile /etc/ssh/keyfiles/pubkey.pub" >> /etc/ssh/sshd_config
+
     # Allow Access as root (disabled on default)
     if [ -z "$ENABLEROOT" ];
     then
