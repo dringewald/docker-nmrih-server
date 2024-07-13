@@ -32,10 +32,10 @@ build_docker_nmrih:
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "$maintainer/$dockerimagename:$version"
       --destination "$hostname/$maintainer/$dockerimagename:$version"
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      exists:
-        - README.md
-        - examples/*
-      when: never
-    - if: $CI_COMMIT_BRANCH == "master"
+  only:
+    refs:
+      - master
+  except:
+    changes:
+      - examples/*
+      - README.md
