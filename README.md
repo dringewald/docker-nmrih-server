@@ -28,7 +28,7 @@ The App ID for NMRIH is: 317670
 
 Start the Docker container and make sure to mount a directory or volume to keep the files persistent:
 
-    docker run -p 22:22/tcp -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
+    docker run -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
     -v ~/nmrih-gamedata-folder:/home/nmrih/server \
     -v ~/nmrih-steamcmd-folder:/home/nmrih/steamcmd \
     -e NMRIH_TOKEN="GSLT" \
@@ -36,7 +36,7 @@ Start the Docker container and make sure to mount a directory or volume to keep 
 
 Or if you want to use a different startmap, you could set that via a variable as follows:
 
-    docker run -p 22:22/tcp -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
+    docker run -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
     -v ~/nmrih-gamedata-folder:/home/nmrih/server \
     -v ~/nmrih-steamcmd-folder:/home/nmrih/steamcmd \
     -e NMRIH_TOKEN="GSLT" \
@@ -54,7 +54,7 @@ You can achieve the use of the secret by using the following commands. Please ma
 
 Now run the container with the following command:
 
-    docker run -p 22:22/tcp -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
+    docker run -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
     -v ~/nmrih-gamedata-folder:/home/nmrih/server \
     -v ~/nmrih-steamcmd-folder:/home/nmrih/steamcmd \
     -e NMRIH_TOKEN="GSLT" \
@@ -65,7 +65,7 @@ If you don't want to use a secret, then you could also manually set the variable
 It is not advised to do so, due to security risks.  
 Even if it isn't recommand, it is needed in some cases.  
 
-    docker run -p 22:22/tcp -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
+    docker run -p 27010:27010/udp -p 27015:27015/tcp -p 27015:27015/udp -p 27020:27020/udp \
     -v ~/nmrih-gamedata-folder:/home/nmrih/server \
     -v ~/nmrih-steamcmd-folder:/home/nmrih/steamcmd \
     -e NMRIH_TOKEN="GSLT" \
