@@ -201,6 +201,18 @@ then
     chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_ed25519_key
     chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_rsa_key
 
+    # Check if nmrih-keyfile-dir exists - else create it
+    if [ ! -d "/etc/ssh/nmrih-keyfiles" ]; then
+      # Create nmrih-keyfile dir if not exist
+      mkdir -p /etc/ssh/nmrih-keyfiles
+    fi
+
+    # Check if root-keyfiles-dir exists - else create it
+    if [ ! -d "/etc/ssh/root-keyfiles" ]; then
+      # Create root-keyfiles dir if not exist
+      mkdir -p /etc/ssh/root-keyfiles
+    fi
+
     # Create empty nmrih-keyfiles pubkeyfile if not exist
     if [ ! -f "/etc/ssh/nmrih-keyfiles/pubkey.pub" ]; then
       touch /etc/ssh/nmrih-keyfiles/pubkey.pub

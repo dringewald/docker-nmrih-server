@@ -26,7 +26,6 @@ spec:
       labels:
         app: nmrih
     spec:
-      hostNetwork: true
       containers:
       - name: nmrih
         image: holt31/nmrih-server:latest
