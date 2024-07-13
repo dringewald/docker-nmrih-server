@@ -230,3 +230,14 @@ In a Kubernetes cluster, it could therefore happen that the error message appear
     ```
     In this case, a new [Game Server Login Token (GSLT)](https://steamcommunity.com/dev/managegameservers) must be created and specified.
     The App ID for NMRIH is: 317670
+
+3. If you get the error "Permission denied", then make sure you assign the correct permission to the volumes.  
+    The error message on startup of the container may look like this.
+    ```
+    rm: cannot remove '/home/nmrih/steamcmd': Device or resource busy
+    rm: cannot remove '/home/nmrih/server': Device or resource busy
+    steamcmd.sh
+    tar: steamcmd.sh: Cannot open: Permission denied
+    ```
+    Make sure to create and set the permissions correctly.
+    Check the [Volumes](#volumes) section about the correct permissions. 
