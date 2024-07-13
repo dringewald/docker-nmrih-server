@@ -146,11 +146,15 @@ This could be useful if you need it for automatitions were programs can't use yo
 
 ## Volumes
 This image has 3 directories for which it makes sense to make them persistent.
-|Directory|Description|Required/Optional|
-| ------------- | ------------- | ------------- |
-|/home/nmrih/server|This directory contains all files relevant to the game. This includes all maps, models etc. The game files are downloaded at the first start. If this folder is not specified as a volume, the game will be downloaded again each time it is started.|Required|
-|/home/nmrih/steamcmd|Backs up the steamcmd files. Not absolutely necessary, but recommended for a faster start of the container. Otherwise, steamcmd will be downloaded per start.|Optional (recommend)|
-|/etc/ssh/host-keyfiles|Your should create a Volume for the SSH host keys when SSH/SFTP is being used.<br/>Creating a volume for /etc/ssh/host-keyfiles ensures that SSH host keys persist across container restarts and are not lost when containers are recreated.<br/>SSH host keys should not be recreated to maintain consistent host identity, ensuring uninterrupted and secure SSH connections without triggering security warnings for clients.|Optional (recommend when using SSH)|
+Make sure to set the correct permissions for the user and group (1000) of both nmrih gameserver files.  
+With the help of the NMRIH_SETPERMS variable, the container should set the correct permissions on startup for all important folders.
+If NMRIH_SETPERMS is used, the startup of the container will be slighter longer.
+
+|Directory|Description|Required/Optional|Permissions|
+| ------------- | ------------- | ------------- | ------------- |
+|/home/nmrih/server|This directory contains all files relevant to the game. This includes all maps, models etc. The game files are downloaded at the first start. If this folder is not specified as a volume, the game will be downloaded again each time it is started.|Required|nmrih:nmrih (1000:1000)|
+|/home/nmrih/steamcmd|Backs up the steamcmd files. Not absolutely necessary, but recommended for a faster start of the container. Otherwise, steamcmd will be downloaded per start.|Optional (recommend)|nmrih:nmrih (1000:1000)|
+|/etc/ssh/host-keyfiles|Your should create a Volume for the SSH host keys when SSH/SFTP is being used.<br/>Creating a volume for /etc/ssh/host-keyfiles ensures that SSH host keys persist across container restarts and are not lost when containers are recreated.<br/>SSH host keys should not be recreated to maintain consistent host identity, ensuring uninterrupted and secure SSH connections without triggering security warnings for clients.|Optional (recommend when using SSH)|root:root|
 
 ## Variables
 Here you'll find a list of every variable that can be set in the container.  
