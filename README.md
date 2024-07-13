@@ -147,8 +147,8 @@ This could be useful if you need it for automatitions were programs can't use yo
 ## Volumes
 This image has 3 directories for which it makes sense to make them persistent.
 Make sure to set the correct permissions for the user and group (1000) of both nmrih gameserver files.  
-With the help of the NMRIH_SETPERMS variable, the container should set the correct permissions on startup for all important folders.
-If NMRIH_SETPERMS is used, the startup of the container will be slighter longer.
+With the help of the NMRIH_FIXPERMS variable, the container should set the correct permissions on startup for all important folders.
+If NMRIH_FIXPERMS is used, the startup of the container will be slighter longer.
 
 |Directory|Description|Required/Optional|Permissions|
 | ------------- | ------------- | ------------- | ------------- |
@@ -172,7 +172,7 @@ Just include them in you docker run command.
 |NMRIH_USERPWD|Password|Sets a user password for the nmrih user. If none is entered, one is generated randomly and displayed in the log. You should use |Random generated Password|
 |NMRIH_UPDATECHECK|true / 1|Updates the NMRIH server when the image is started|true|
 |NMRIH_VALIDATECHECK|true/ 1|Validates the NMRIH files when the image is started|false|
-|NMRIH_SETPERMS|true / 1|Sets the correct permissions when starting the image|false|
+|NMRIH_FIXPERMS|true / 1|Sets the correct permissions when starting the image|false|
 |NMRIH_RCONPW|Password|Sets the RCON password|Not set|
 |NMRIH_PW|Password|Sets a server password|Not set|
 |NMRIH_CLIENT_PORT|Port|Sets the client port (UDP)|27010|
