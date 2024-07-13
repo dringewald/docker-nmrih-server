@@ -34,8 +34,8 @@ fi
 if [[ $(grep -L "NMRIH_VALIDATECHECK" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_VALIDATECHECK\"" >> /etc/sudoers
 fi
-if [[ $(grep -L "NMRIH_SETPERMS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_SETPERMS\"" >> /etc/sudoers
+if [[ $(grep -L "NMRIH_FIXPERMS" /etc/sudoers) ]]; then
+	echo "Defaults env_keep += \"NMRIH_FIXPERMS\"" >> /etc/sudoers
 fi
 if [[ $(grep -L "NMRIH_RCONPW" /etc/sudoers) ]]; then
 	echo "Defaults env_keep += \"NMRIH_RCONPW\"" >> /etc/sudoers

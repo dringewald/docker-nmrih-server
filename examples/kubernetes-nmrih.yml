@@ -59,8 +59,6 @@ spec:
           value: "true"
         - name: NMRIH_VALIDATECHECK
           value: "false"
-        - name: NMRIH_SETPERMS
-          value: "true"
         - name: NMRIH_STARTMAP
           value: "nmo_lakeside"
         - name: NMRIH_TOKEN

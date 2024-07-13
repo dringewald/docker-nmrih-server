@@ -5,8 +5,6 @@ variables:
   dockerimagename: "nmrih-server"
   dockersubfolder: "."
   version: "latest"
-  kubeuser: "root"
-  kubemaster: "10.0.1.3"
 
 stages:
   - build_docker
@@ -32,61 +30,9 @@ build_docker_nmrih:
       /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "$maintainer/$dockerimagename:$version"
       --destination "$hostname/$maintainer/$dockerimagename:$version"
 
-  only:
-    refs:
-      - master
-
-restart_nmrih_pod:
-  stage: restart_pods
-  when: manual
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -p22 $kubeuser@$kubemaster '/usr/bin/kubectl delete pod -n web $(/usr/bin/kubectl get pod -n web | grep nmrih | awk '\''{print $1}'\'')'
-    - echo -e "Host *\n\tStrictHostKeyChecking yes\n\n" > ~/.ssh/config
-  only:
-    refs:
-      - master
-
-get_nmrih_logs:
-  stage: get_logs
-  when: manual
-  allow_failure: true
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -p22 $kubeuser@$kubemaster '/usr/bin/kubectl logs -n web $(/usr/bin/kubectl get pod -n web | grep nmrih | awk '\''{print $1}'\'')'
-    - echo -e "Host *\n\tStrictHostKeyChecking yes\n\n" > ~/.ssh/config
-  only:
-    refs:
-      - master
-
-describe_nmrih_pods:
-  stage: describe_pods
-  when: manual
-  allow_failure: true
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh -p22 $kubeuser@$kubemaster '/usr/bin/kubectl describe pod -n web $(/usr/bin/kubectl get pod -n web | grep nmrih | awk '\''{print $1}'\'')'
-    - echo -e "Host *\n\tStrictHostKeyChecking yes\n\n" > ~/.ssh/config
   only:
     refs:
       - master
