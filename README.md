@@ -10,11 +10,16 @@ This image provides a fully functional No More Room in Hell Server.
 * Follows the KISS principle (Keep It Simple, Stupid) to make it easy to understand and adjust the image to your needs
 * Optimized to be run as a single pod in a kubernetes cluster
 
-You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitLab repository](#useful-links)
+You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitLab repository](#useful-links).
 
 ## Goal of this project
 The goal of this container image is to provide an easy to run No More Room in Hell gameserver in a container which follows the best practices.
 I did not find images that were easy to understand. Most were optimized for their own needs. With this image I try to provide you an easy container for your favorite game.
+
+## How does the image work (in a nutshell)?
+When the image is started, the container downloads steamcmd.  
+This in turn downloads the game files.  
+The game server is then started with the variables you used.  
 
 ## Usage
 Before you can use this image, you must create at least one [Game Server Login Token (GSLT)](https://steamcommunity.com/dev/managegameservers).  
