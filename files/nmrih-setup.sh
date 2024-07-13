@@ -3,36 +3,40 @@
 ###################################
 ######## RUN AS nmrih USER ########
 ###################################
-if [ "$EUID" -ne 1000 ]; then
+if [ "$EUID" -ne "$(id -u nmrih)" ]; then
     echo "------------------------"
-	echo "Your EUID is $EUID! It should be $(id -u nmrih)"
-	echo "Please run as user \"nmrih\"!"
-	echo "------------------------"
+    echo "Your EUID is $EUID! It should be $(id -u nmrih)"
+    echo "Please run as user \"nmrih\"!"
+    echo "------------------------"
+    exit 1
 fi
 
 # Download-Steamcmd
 if [ ! -d /home/nmrih/steamcmd ] || [ -z "$(ls -A /home/nmrih/steamcmd)" ]; then
     mkdir -p /home/nmrih/steamcmd
-    cd /home/nmrih/steamcmd
+    cd /home/nmrih/steamcmd || exit 1
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
     mv -v steamcmd.sh steamcmd
-    if [[ $(grep -L "export PATH" /home/nmrih/.bashrc) ]]; then
+    if ! grep -q "export PATH=.*steamcmd" /home/nmrih/.bashrc; then
         echo "export PATH=$PATH:/home/nmrih/steamcmd" >> /home/nmrih/.bashrc
     fi
 fi
 
 # Update Steamcmd
-if [ ! -z "$NMRIH_STEAMCMDCHECK" ]; then
-	if [[ "$NMRIH_STEAMCMDCHECK" = "true" || "$NMRIH_STEAMCMDCHECK" = "1" ]]; then
-		rm -vfR /home/nmrih/steamcmd
-		mkdir -p /home/nmrih/steamcmd
-		cd /home/nmrih/steamcmd
-		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
-		mv -v steamcmd.sh steamcmd
-		if [[ $(grep -L "export PATH" /home/nmrih/.bashrc) ]]; then
-			echo "export PATH=$PATH:/home/nmrih/steamcmd" >> /home/nmrih/.bashrc
-		fi
-	fi
+if [ -n "$NMRIH_STEAMCMDCHECK" ]; then
+    if [[ "$NMRIH_STEAMCMDCHECK" = "true" || "$NMRIH_STEAMCMDCHECK" = "1" ]]; then
+        if [ ! -d /home/nmrih/steamcmd ]; then
+            mkdir -p /home/nmrih/steamcmd
+        else
+            rm -vfR /home/nmrih/steamcmd/*
+        fi
+        cd /home/nmrih/steamcmd || exit 1
+        curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+        mv -v steamcmd.sh steamcmd
+        if ! grep -q "export PATH=.*steamcmd" /home/nmrih/.bashrc; then
+            echo "export PATH=$PATH:/home/nmrih/steamcmd" >> /home/nmrih/.bashrc
+        fi
+    fi
 fi
 
 # Install the Game if it's not found
@@ -41,17 +45,17 @@ if [ ! -d /home/nmrih/server ] || [ ! -d /home/nmrih/server/nmrih ] || [ -z "$(l
 fi
 
 # Update the Game
-if [ ! -z "$NMRIH_UPDATECHECK" ]; then
-	if [[ "$NMRIH_UPDATECHECK" = "true" || "$NMRIH_UPDATECHECK" = "1" ]]; then
-		/home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 +quit
-	fi
+if [ -n "$NMRIH_UPDATECHECK" ]; then
+    if [[ "$NMRIH_UPDATECHECK" = "true" || "$NMRIH_UPDATECHECK" = "1" ]]; then
+        /home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 +quit
+    fi
 fi
 
 # Validate the Game
-if [ ! -z "$NMRIH_VALIDATECHECK" ]; then
-	if [[ "$NMRIH_VALIDATECHECK" = "true" || "$NMRIH_VALIDATECHECK" = "1" ]]; then
-		/home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
-	fi
+if [ -n "$NMRIH_VALIDATECHECK" ]; then
+    if [[ "$NMRIH_VALIDATECHECK" = "true" || "$NMRIH_VALIDATECHECK" = "1" ]]; then
+        /home/nmrih/steamcmd/steamcmd +force_install_dir /home/nmrih/server +login anonymous +app_update 317670 validate +quit
+    fi
 fi
 
 # exit gracefully

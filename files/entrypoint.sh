@@ -7,81 +7,22 @@ DEBIAN_PRIORITY=critical
 UBUNTU_VERSION=$(lsb_release -rs)
 
 # Making sure to preserve env for the nmrih-user for the nmrih variables
-if [[ $(grep -L "TZ" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"TZ\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "ENABLESSH" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"ENABLESSH\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "ENABLEROOT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"ENABLEROOT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "ENABLEPWD" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"ENABLEPWD\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "SSHKEY" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"SSHKEY\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_UPDATEPACKAGES" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_UPDATEPACKAGES\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_USERPWD" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_USERPWD\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_UPDATECHECK" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_UPDATECHECK\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_VALIDATECHECK" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_VALIDATECHECK\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_FIXPERMS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_FIXPERMS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_RCONPW" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_RCONPW\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_PW" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_PW\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_CLIENT_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_CLIENT_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_TV_PORT" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_TV_PORT\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_IP_ADDRESS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_IP_ADDRESS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_MAXPLAYERS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_MAXPLAYERS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_STARTMAP" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_STARTMAP\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_REGION" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_REGION\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_TOKEN" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_TOKEN\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_AUTH_KEY" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_AUTH_KEY\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_CONFIG_FILE" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_CONFIG_FILE\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_ADDITIONAL_ARGS" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_ADDITIONAL_ARGS\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "NMRIH_DISABLEVAC" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"NMRIH_DISABLEVAC\"" >> /etc/sudoers
-fi
-if [[ $(grep -L "VACFLAG" /etc/sudoers) ]]; then
-	echo "Defaults env_keep += \"VACFLAG\"" >> /etc/sudoers
-fi
+env_vars=(
+    "TZ" "ENABLESSH" "ENABLEROOT" "ENABLEPWD" "SSHKEY"
+    "NMRIH_UPDATEPACKAGES" "NMRIH_USERPWD" "NMRIH_UPDATECHECK"
+    "NMRIH_VALIDATECHECK" "NMRIH_FIXPERMS" "NMRIH_RCONPW"
+    "NMRIH_PW" "NMRIH_CLIENT_PORT" "NMRIH_PORT"
+    "NMRIH_TV_PORT" "NMRIH_IP_ADDRESS" "NMRIH_MAXPLAYERS"
+    "NMRIH_STARTMAP" "NMRIH_REGION" "NMRIH_TOKEN"
+    "NMRIH_AUTH_KEY" "NMRIH_CONFIG_FILE" "NMRIH_ADDITIONAL_ARGS"
+    "NMRIH_DISABLEVAC" "VACFLAG"
+)
+
+for var in "${env_vars[@]}"; do
+    if [[ $(grep -L "$var" /etc/sudoers) ]]; then
+        echo "Defaults env_keep += \"$var\"" >> /etc/sudoers
+    fi
+done
 
 # Function to set timezone
 set_timezone() {
@@ -141,18 +82,22 @@ else
     fi
 fi
 
-# Check if steamcmd-Folder is empty and delete it for proper access
+# Check if steamcmd-Folder is empty and delete contents for proper access
 if [ -d /home/nmrih/steamcmd ]; then
-	if [ ! "$(ls -A /home/nmrih/steamcmd)" ]; then
-		rm -vR /home/nmrih/steamcmd
-	fi
+    if [ ! "$(ls -A /home/nmrih/steamcmd)" ]; then
+        rm -vR /home/nmrih/steamcmd/*
+    fi
+else
+    mkdir -p /home/nmrih/steamcmd || exit 1
 fi
 
-# Check if server-Folder is empty and delete it for proper access
+# Check if server-Folder is empty and delete contents for proper access
 if [ -d /home/nmrih/server ]; then
-	if [[ ! "$(ls -A /home/nmrih/server)" && ! -d /home/nmrih/server/nmrih ]]; then
-		rm -vR /home/nmrih/server
-	fi
+    if [[ ! "$(ls -A /home/nmrih/server)" && ! -d /home/nmrih/server/nmrih ]]; then
+        rm -vR /home/nmrih/server/*
+    fi
+else
+    mkdir -p /home/nmrih/server || exit 1
 fi
 
 # Last but not Least run Permission Check as root to set correct permissions
