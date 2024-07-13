@@ -16,7 +16,7 @@ You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitLab repo
 The goal of this container image is to provide an easy to run No More Room in Hell gameserver in a container which follows the best practices.
 I did not find images that were easy to understand. Most were optimized for their own needs. With this image I try to provide you an easy container for your favorite game.
 
-## How does the image work (in a nutshell)?
+## How the image works (in a nutshell)
 When the image is started, the container downloads steamcmd.  
 This in turn downloads the game files.  
 The game server is then started with the variables you used.  
