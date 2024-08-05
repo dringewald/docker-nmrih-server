@@ -154,7 +154,7 @@ If NMRIH_FIXPERMS is used, the startup of the container will be slighter longer.
 | ------------- | ------------- | ------------- | ------------- |
 |/home/nmrih/server|This directory contains all files relevant to the game. This includes all maps, models etc. The game files are downloaded at the first start. If this folder is not specified as a volume, the game will be downloaded again each time it is started.|Required|nmrih:nmrih (1000:1000)|
 |/home/nmrih/steamcmd|Backs up the steamcmd files. Not absolutely necessary, but recommended for a faster start of the container. Otherwise, steamcmd will be downloaded per start.|Optional (recommend)|nmrih:nmrih (1000:1000)|
-|/etc/ssh/host-keyfiles|Your should create a Volume for the SSH host keys when SSH/SFTP is being used.<br/>Creating a volume for /etc/ssh/host-keyfiles ensures that SSH host keys persist across container restarts and are not lost when containers are recreated.<br/>SSH host keys should not be recreated to maintain consistent host identity, ensuring uninterrupted and secure SSH connections without triggering security warnings for clients.|Optional (recommend when using SSH)|root:root|
+|/etc/ssh/host-keyfiles|You should create a Volume for the SSH host keys when SSH/SFTP is being used.<br/>Creating a volume for /etc/ssh/host-keyfiles ensures that SSH host keys persist across container restarts and are not lost when containers are recreated.<br/>SSH host keys should not be recreated to maintain consistent host identity, ensuring uninterrupted and secure SSH connections without triggering security warnings for clients.|Optional (recommend when using SSH)|root:root|
 
 ## Variables
 Here you'll find a list of every variable that can be set in the container.  
@@ -169,7 +169,7 @@ Just include them in you docker run command.
 |ENABLEROOT|true / 1|Allows access to the root user via SSH|false|
 |ENABLEPWD|true / 1|Allows SSH access via password|false|
 |NMRIH_UPDATEPACKAGES|true / 1|Updates all packages when starting the image|Not set|
-|NMRIH_USERPWD|Password|Sets a user password for the nmrih user. If none is entered, one is generated randomly and displayed in the log. You should use |Random generated Password|
+|NMRIH_USERPWD|Password|Sets a user password for the nmrih user. If none is entered, one is generated randomly and displayed in the log. You should use the secret if possible |Random generated Password|
 |NMRIH_UPDATECHECK|true / 1|Updates the NMRIH server when the image is started|true|
 |NMRIH_VALIDATECHECK|true/ 1|Validates the NMRIH files when the image is started|false|
 |NMRIH_FIXPERMS|true / 1|Sets the correct permissions when starting the image|false|
