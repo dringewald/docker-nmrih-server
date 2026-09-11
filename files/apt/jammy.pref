@@ -1,0 +1,21 @@
+# Ubuntu 22.04 (jammy) gets a lower priority than the default of 500
+# A package from jammy is only used if it doesn't exist in Ubuntu 26.04 at all, which is the case for libtinfo5
+# Packages which exist in both releases are always taken from Ubuntu 26.04
+# Both rules are needed, because a rule without ":any" only matches the native architecture (amd64)
+Package: *
+Pin: release n=jammy
+Pin-Priority: 100
+
+Package: *:any
+Pin: release n=jammy
+Pin-Priority: 100
+
+# Allow libtinfo5 from jammy
+# The architectures are listed separately on purpose, a rule with ":any" did not work here
+Package: libtinfo5
+Pin: release n=jammy
+Pin-Priority: 990
+
+Package: libtinfo5:i386
+Pin: release n=jammy
+Pin-Priority: 990

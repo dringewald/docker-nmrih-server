@@ -11,6 +11,22 @@ kind: Namespace
 metadata:
   name: games
 ---
+# Creates a Secret for the passwords (all keys are optional, remove the ones you don't need)
+# Every key is mounted as a file into /run/secrets in the container:
+# nmrih_userpwd = password of the nmrih user, nmrih_rconpw = RCON password, nmrih_pw = server password
+# Instead of this, you could also create the secret with the following command:
+# kubectl create secret generic nmrih-secrets -n games --from-literal=nmrih_userpwd='your_password_here' --from-literal=nmrih_rconpw='your_rcon_password_here' --from-literal=nmrih_pw='your_server_password_here'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nmrih-secrets
+  namespace: games
+type: Opaque
+stringData:
+  nmrih_userpwd: "your_password_here"
+  nmrih_rconpw: "your_rcon_password_here"
+  nmrih_pw: "your_server_password_here"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,6 +34,9 @@ metadata:
   namespace: games
 spec:
   replicas: 1
+  # Stop the old pod before starting a new one (the volume is ReadWriteOnce and only one server should run)
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: nmrih
@@ -26,6 +45,8 @@ spec:
       labels:
         app: nmrih
     spec:
+      # Time the server gets to shut down gracefully before it is killed
+      terminationGracePeriodSeconds: 60
       containers:
       - name: nmrih
         image: holt31/nmrih-server:latest
@@ -46,8 +67,6 @@ spec:
         env:
         - name: TZ
           value: "Europe/Berlin"
-        - name: NMRIH_USERPWD
-          value: ""
         - name: NMRIH_FIXPERMS
           value: "true"
         - name: SSHKEY
@@ -60,8 +79,6 @@ spec:
           value: "false"
         - name: NMRIH_STARTMAP
           value: "nmo_lakeside"
-        - name: NMRIH_TOKEN
-          value: ""
         volumeMounts:
         - name: nmrih-persistent-storage
           mountPath: /home/nmrih/server
@@ -69,10 +86,19 @@ spec:
         - name: nmrih-persistent-storage
           mountPath: /home/nmrih/steamcmd
           subPath: steamcmd/
+        - name: nmrih-secrets
+          mountPath: /run/secrets
+          readOnly: true
       volumes:
       - name: nmrih-persistent-storage
         persistentVolumeClaim:
           claimName: nmrih-storage
+      - name: nmrih-secrets
+        secret:
+          secretName: nmrih-secrets
+          defaultMode: 0400
+          # The pod also starts without the secret (the variables or a random password are used instead)
+          optional: true
 ---
 # Creates a nmrih service as a LoadBalancer (don't forget to forward the ports if your cluster runs behind a firewall/router)
 apiVersion: v1
@@ -109,11 +135,11 @@ spec:
     app: nmrih
 ---
 # Create a PersistentVolume (The example is using longhorn, feel free to change it to your needs)
+# PersistentVolumes are cluster-wide, so they don't have a namespace
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: nmrih
-  namespace: games
 spec:
   capacity:
     storage: 20Gi

@@ -1,0 +1,12 @@
+# Ubuntu 22.04 (jammy) repository
+# Only used for libtinfo5, which NMRIH needs for readline in the server console (see jammy.pref)
+# No Signed-By, so apt uses the keys in /etc/apt/trusted.gpg.d (includes the 2018 archive key which signs jammy)
+Types: deb
+URIs: http://archive.ubuntu.com/ubuntu
+Suites: jammy jammy-updates
+Components: universe
+
+Types: deb
+URIs: http://security.ubuntu.com/ubuntu
+Suites: jammy-security
+Components: universe

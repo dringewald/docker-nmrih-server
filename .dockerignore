@@ -1,0 +1,7 @@
+.git
+.gitlab-ci.yml
+.dockerignore
+examples
+README.md
+project-image.png
+cleanup-images.sh

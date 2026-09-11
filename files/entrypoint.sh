@@ -4,25 +4,21 @@
 DEBIAN_FRONTEND=noninteractive
 DEBCONF_NONINTERACTIVE_SEEN=true
 DEBIAN_PRIORITY=critical
-UBUNTU_VERSION=$(lsb_release -rs)
+UBUNTU_VERSION=$(. /etc/os-release && echo "$VERSION_ID")
 
-# Making sure to preserve env for the nmrih-user for the nmrih variables
-env_vars=(
-    "TZ" "ENABLESSH" "ENABLEROOT" "ENABLEPWD" "SSHKEY"
-    "NMRIH_UPDATEPACKAGES" "NMRIH_USERPWD" "NMRIH_UPDATECHECK"
-    "NMRIH_VALIDATECHECK" "NMRIH_FIXPERMS" "NMRIH_RCONPW"
-    "NMRIH_PW" "NMRIH_CLIENT_PORT" "NMRIH_PORT"
-    "NMRIH_TV_PORT" "NMRIH_IP_ADDRESS" "NMRIH_MAXPLAYERS"
-    "NMRIH_STARTMAP" "NMRIH_REGION" "NMRIH_TOKEN"
-    "NMRIH_AUTH_KEY" "NMRIH_CONFIG_FILE" "NMRIH_ADDITIONAL_ARGS"
-    "NMRIH_DISABLEVAC" "VACFLAG"
-)
+# Commands are run as nmrih user via setpriv, which keeps the environment (all NMRIH_* variables)
+NMRIH_SETPRIV=(setpriv --reuid=nmrih --regid=nmrih --init-groups)
 
-for var in "${env_vars[@]}"; do
-    if [[ $(grep -L "$var" /etc/sudoers) ]]; then
-        echo "Defaults env_keep += \"$var\"" >> /etc/sudoers
+# Read a secret file from /run/secrets (secrets are preferred over the variables)
+# Line breaks are removed (e.g. from files created with echo or on Windows)
+read_secret() {
+    local file="/run/secrets/$1"
+    if [ -s "$file" ]; then
+        tr -d '\r\n' < "$file"
+        return 0
     fi
-done
+    return 1
+}
 
 # Function to set timezone
 set_timezone() {
@@ -40,7 +36,7 @@ set_timezone() {
 }
 
 # Main script
-if [[ "$UBUNTU_VERSION" == "24.04" ]] || [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+if [[ "$UBUNTU_VERSION" == "26.04" ]] || [[ "$UBUNTU_VERSION" == "24.04" ]] || [[ "$UBUNTU_VERSION" == "22.04" ]]; then
     set_timezone
 else
     echo "Unsupported Ubuntu version: $UBUNTU_VERSION"
@@ -55,32 +51,47 @@ if [ ! -z "$NMRIH_UPDATEPACKAGES" ]; then
 	fi
 fi
 
-# Check if the Docker secret for NMRIH user password exists
-if [ -f "/run/secrets/nmrih_userpwd" ]; then
-    NMRIH_USERPWD=$(cat /run/secrets/nmrih_userpwd)
-    (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-    passwd -u nmrih
-    echo "Password for nmrih user set from Docker secret."
+# Set the password for the nmrih user
+# Priority: secret /run/secrets/nmrih_userpwd > variable NMRIH_USERPWD > random password (stored in a root-only file, not in the log)
+NMRIH_USERPWD_FILE="/root/nmrih_userpwd"
+if NMRIH_SECRET=$(read_secret nmrih_userpwd); then
+    NMRIH_USERPWD="$NMRIH_SECRET"
+    echo "Password for nmrih user set from secret /run/secrets/nmrih_userpwd."
+elif [ -n "$NMRIH_USERPWD" ]; then
+    echo "Custom Password is set via variable NMRIH_USERPWD"
 else
-    # Check if a User-PW is set
-    if [ -z "$NMRIH_USERPWD" ]; then
-        NMRIH_USERPWD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16; echo)
-        (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-        passwd -u nmrih
-        echo "------------------------"
-        echo ""
-        echo "Default Password set to:"
-        echo "${NMRIH_USERPWD}"
-        echo ""
-        echo "Please set a static Password to the variable NMRIH_USERPWD to stop the random generation of a password on every start of the container"
-        echo ""
-        echo "------------------------"
-    else
-        (echo "${NMRIH_USERPWD}"; echo "${NMRIH_USERPWD}") | passwd nmrih
-        passwd -u nmrih
-        echo "Custom Password is set via variable NMRIH_USERPWD"
+    # Reuse the generated password on container restarts
+    if [ ! -s "$NMRIH_USERPWD_FILE" ]; then
+        (umask 077; tr -dc A-Za-z0-9 </dev/urandom | head -c 16 > "$NMRIH_USERPWD_FILE")
     fi
+    NMRIH_USERPWD=$(cat "$NMRIH_USERPWD_FILE")
+    echo "------------------------"
+    echo ""
+    echo "No password is set for the nmrih user, so a random password was generated."
+    echo "You can read it with:"
+    echo "  docker exec <container> cat $NMRIH_USERPWD_FILE"
+    echo "  kubectl exec <pod> -- cat $NMRIH_USERPWD_FILE"
+    echo ""
+    echo "Set the variable NMRIH_USERPWD or the secret \"nmrih_userpwd\" to use your own password."
+    echo ""
+    echo "------------------------"
 fi
+echo "nmrih:${NMRIH_USERPWD}" | chpasswd
+passwd -u nmrih > /dev/null
+# Don't pass the password on to the game server
+unset NMRIH_USERPWD
+
+# RCON and server password
+# Priority: secret /run/secrets/nmrih_rconpw or /run/secrets/nmrih_pw > variable NMRIH_RCONPW or NMRIH_PW
+if NMRIH_SECRET=$(read_secret nmrih_rconpw); then
+    export NMRIH_RCONPW="$NMRIH_SECRET"
+    echo "RCON password set from secret /run/secrets/nmrih_rconpw."
+fi
+if NMRIH_SECRET=$(read_secret nmrih_pw); then
+    export NMRIH_PW="$NMRIH_SECRET"
+    echo "Server password set from secret /run/secrets/nmrih_pw."
+fi
+unset NMRIH_SECRET
 
 # Check if steamcmd-Folder is empty and delete contents for proper access
 if [ -d /home/nmrih/steamcmd ]; then
@@ -111,7 +122,8 @@ then
 fi
 
 # Run some commands as nmrih user
-sudo -i -u nmrih /opt/nmrih/nmrih-setup.sh
+cd /home/nmrih || exit 1
+HOME=/home/nmrih USER=nmrih LOGNAME=nmrih "${NMRIH_SETPRIV[@]}" /opt/nmrih/nmrih-setup.sh
 
 # Start SSH if Enabled
 if [ ! -z "$ENABLESSH" ];
@@ -146,79 +158,51 @@ then
     chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_ed25519_key
     chmod -vR 600 /etc/ssh/host-keyfiles/ssh_host_rsa_key
 
-    # Check if nmrih-keyfile-dir exists - else create it
-    if [ ! -d "/etc/ssh/nmrih-keyfiles" ]; then
-      # Create nmrih-keyfile dir if not exist
-      mkdir -p /etc/ssh/nmrih-keyfiles
-    fi
+    # Authorized keys are stored in one file per user:
+    # /etc/ssh/nmrih-keyfiles/pubkey.pub and /etc/ssh/root-keyfiles/pubkey.pub
+    mkdir -p /etc/ssh/nmrih-keyfiles /etc/ssh/root-keyfiles
+    touch /etc/ssh/nmrih-keyfiles/pubkey.pub /etc/ssh/root-keyfiles/pubkey.pub
 
-    # Check if root-keyfiles-dir exists - else create it
-    if [ ! -d "/etc/ssh/root-keyfiles" ]; then
-      # Create root-keyfiles dir if not exist
-      mkdir -p /etc/ssh/root-keyfiles
-    fi
-
-    # Create empty nmrih-keyfiles pubkeyfile if not exist
-    if [ ! -f "/etc/ssh/nmrih-keyfiles/pubkey.pub" ]; then
-      touch /etc/ssh/nmrih-keyfiles/pubkey.pub
-    fi
-
-    # Create empty root-keyfiles pubkeyfile if not exist
-    if [ ! -f "/etc/ssh/root-keyfiles/pubkey.pub" ]; then
-      touch /etc/ssh/root-keyfiles/pubkey.pub
-    fi
-    
-    # Add Pubkey to file, if variable is set
-    if [ ! -z "$SSHKEY" ]; then
-        mkdir -p /etc/ssh/keyfiles
-        touch /etc/ssh/keyfiles/pubkey.pub
+    # Add Pubkeys from the variable (only if they are not already in the file)
+    if [ -n "$SSHKEY" ]; then
         IFS=';' read -r -a keys <<< "$SSHKEY"
         for key in "${keys[@]}"; do
-            echo "$key" >> /etc/ssh/nmrih-keyfiles/pubkey.pub
-            echo "$key" >> /etc/ssh/root-keyfiles/pubkey.pub
+            [ -z "$key" ] && continue
+            for keyfile in /etc/ssh/nmrih-keyfiles/pubkey.pub /etc/ssh/root-keyfiles/pubkey.pub; do
+                grep -qxF -- "$key" "$keyfile" || echo "$key" >> "$keyfile"
+            done
         done
     fi
 
-    # Add Ownership and permissions for nmrih
-    chown -vR nmrih:nmrih /etc/ssh/nmrih-keyfiles
-    chmod -v 770 /etc/ssh/nmrih-keyfiles
-    chmod -v 600 /etc/ssh/nmrih-keyfiles/pubkey.pub
-
-    # Add Ownership and permissions for root
-    chown -vR root:root /etc/ssh/root-keyfiles
-    chmod -v 770 /etc/ssh/root-keyfiles
-    chmod -v 600 /etc/ssh/root-keyfiles/pubkey.pub
-
-    # Add Trusted SSH-Keyfile to Keyfiles
-    echo "" >> /etc/ssh/sshd_config
-    echo "HostKey /etc/ssh/host-keyfiles/ssh_host_ed25519_key" >> /etc/ssh/sshd_config
-    echo "HostKey /etc/ssh/host-keyfiles/ssh_host_rsa_key" >> /etc/ssh/sshd_config
-    echo "AuthorizedKeysFile /etc/ssh/keyfiles/pubkey.pub" >> /etc/ssh/sshd_config
+    # Ownership and permissions (sshd rejects keyfiles in group/world writable directories)
+    chown -R nmrih:nmrih /etc/ssh/nmrih-keyfiles
+    chown -R root:root /etc/ssh/root-keyfiles
+    chmod 700 /etc/ssh/nmrih-keyfiles /etc/ssh/root-keyfiles
+    chmod 600 /etc/ssh/nmrih-keyfiles/pubkey.pub /etc/ssh/root-keyfiles/pubkey.pub
 
     # Allow Access as root (disabled on default)
-    if [ -z "$ENABLEROOT" ];
-    then
-      echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+    if [[ "$ENABLEROOT" = "true" || "$ENABLEROOT" = "1" ]]; then
+      PERMITROOTLOGIN="prohibit-password"
     else
-      if [[ "$ENABLEROOT" = "true" || "$ENABLEROOT" = "1" ]]; 
-      then
-        echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config
-      else
-        echo "PermitRootLogin no" >> /etc/ssh/sshd_config
-      fi
+      PERMITROOTLOGIN="no"
     fi
+
     # Allow Password Auth (disabled on default)
-    if [ -z "$ENABLEPWD" ];
-    then
-      echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+    if [[ "$ENABLEPWD" = "true" || "$ENABLEPWD" = "1" ]]; then
+      PASSWORDAUTHENTICATION="yes"
     else
-      if [[ "$ENABLEPWD" = "true" || "$ENABLEPWD" = "1" ]]; 
-      then
-        echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
-      else
-        echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
-      fi
+      PASSWORDAUTHENTICATION="no"
     fi
+
+    # Write the SSH config to a drop-in file (overwritten on every start instead of appended to sshd_config)
+    mkdir -p /etc/ssh/sshd_config.d
+    cat > /etc/ssh/sshd_config.d/nmrih.conf <<EOF
+HostKey /etc/ssh/host-keyfiles/ssh_host_ed25519_key
+HostKey /etc/ssh/host-keyfiles/ssh_host_rsa_key
+AuthorizedKeysFile /etc/ssh/%u-keyfiles/pubkey.pub
+PermitRootLogin $PERMITROOTLOGIN
+PasswordAuthentication $PASSWORDAUTHENTICATION
+EOF
     # Finally start up service
     echo "------------------------"
     /usr/sbin/service ssh start
@@ -230,5 +214,7 @@ else
   /usr/sbin/service ssh stop
 fi
 
-# Run the game as nmrih user
-sudo -i -u nmrih /opt/nmrih/startgame.sh
+# Run the game as nmrih user (exec, so signals like SIGTERM reach the server)
+cd /home/nmrih || exit 1
+export HOME=/home/nmrih USER=nmrih LOGNAME=nmrih
+exec "${NMRIH_SETPRIV[@]}" /opt/nmrih/startgame.sh

@@ -5,20 +5,19 @@ services:
     image: holt31/nmrih-server:latest
     environment:
       TZ: 'Europe/Berlin'
-      NMRIH_USERPWD: '<user pwd>'
       NMRIH_FIXPERMS: 'true'
       SSHKEY: 'ecdsa-sha2-nistp521 AAAAE2... user1@example.com'
       NMRIH_UPDATEPACKAGES: 'true'
       NMRIH_UPDATECHECK: 'true'
       NMRIH_VALIDATECHECK: 'false'
-      NMRIH_SETPERMS: 'true'
       NMRIH_STARTMAP: 'nmo_lakeside'
-      NMRIH_TOKEN: ''
     volumes:
       - 'nmrih-server:/home/nmrih/server:rw'
       - 'nmrih-steamcmd:/home/nmrih/steamcmd:rw'
     secrets:
      - nmrih_userpwd
+     - nmrih_rconpw
+     - nmrih_pw
     ports:
       - 27010:27010/udp
       - 27015:27015/udp
@@ -29,6 +28,15 @@ volumes:
   nmrih-server: {}
   nmrih-steamcmd: {}
 
+# The secrets are mounted as files into /run/secrets in the container
+# If you use Docker Swarm, you could use "external: true" instead of "file"
 secrets:
+  # Password of the nmrih user
   nmrih_userpwd:
-    external: true
+    file: ./nmrih_userpwd.txt
+  # RCON password
+  nmrih_rconpw:
+    file: ./nmrih_rconpw.txt
+  # Server password
+  nmrih_pw:
+    file: ./nmrih_pw.txt
