@@ -7,7 +7,7 @@ LABEL maintainer="Dustin \"Holt\" Ringewald" \
       org.opencontainers.image.title="nmrih-server" \
       org.opencontainers.image.description="No More Room in Hell dedicated server" \
       org.opencontainers.image.authors="Dustin \"Holt\" Ringewald" \
-      org.opencontainers.image.source="https://gitlab.holydev.net/gameserver/docker-nmrih-server" \
+      org.opencontainers.image.source="https://github.com/dringewald/docker-nmrih-server" \
       org.opencontainers.image.licenses="MIT"
 
 # Environments

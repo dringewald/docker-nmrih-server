@@ -11,7 +11,7 @@ This image provides a fully functional No More Room in Hell Server.
 * Follows the KISS principle (Keep It Simple, Stupid) to make it easy to understand and adjust the image to your needs
 * Optimized to be run as a single pod in a kubernetes cluster
 
-You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitLab repository](#useful-links).
+You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).
 
 ## Goal of this project
 The goal of this container image is to provide an easy to run No More Room in Hell gameserver in a container which follows the best practices.
@@ -71,7 +71,7 @@ Now run the container with the following command:
     -v ~/nmrih_userpwd.txt:/run/secrets/nmrih_userpwd:ro \
     holt31/nmrih-server:latest
 
-If you use Docker Compose or Kubernetes, you can find an example for the secret in the docker-compose.yml and kubernetes-nmrih.yml in the [GitLab repository](#useful-links).  
+If you use Docker Compose or Kubernetes, you can find an example for the secret in the docker-compose.yml and kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).  
 If you use Docker Swarm, you could create the secret with the following command and add "--secret nmrih_userpwd" to your "docker service create" command.
 
     echo "your_password_here" | docker secret create nmrih_userpwd -
@@ -111,8 +111,32 @@ With a normal docker run, you could create the files and mount them into the con
     -v ~/nmrih_pw.txt:/run/secrets/nmrih_pw:ro \
     holt31/nmrih-server:latest
 
-You can find examples for Docker Compose and Kubernetes in the docker-compose.yml and kubernetes-nmrih.yml in the [GitLab repository](#useful-links).  
+You can find examples for Docker Compose and Kubernetes in the docker-compose.yml and kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).  
 If you don't want to use a secret, you could still use the variables NMRIH_RCONPW and NMRIH_PW.
+
+Please note that the server.cfg is executed after the start parameters of the server.  
+If you set the RCON password or the server password via a secret or a variable, make sure that there is no "rcon_password" or "sv_password" in your server.cfg.  
+Otherwise the passwords from the server.cfg will override the passwords from the secret or the variable.
+
+#### server.cfg
+
+---
+The image does not create a server.cfg, so the server starts with the default settings.  
+You can find a template for the server.cfg (examples/server.cfg) in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/tree/master/examples).  
+Copy it to /home/nmrih/server/nmrih/cfg/server.cfg and adjust it to your needs.  
+The file is stored in the volume of the game files, so it stays when the container is recreated.  
+If you want to use another name for the file, you could set it via the variable NMRIH_CONFIG_FILE.
+
+You can copy the file into the container with the following commands:
+
+    docker cp server.cfg <container name>:/home/nmrih/server/nmrih/cfg/server.cfg
+    docker exec <container name> chown nmrih:nmrih /home/nmrih/server/nmrih/cfg/server.cfg
+
+    kubectl cp server.cfg games/<pod name>:/home/nmrih/server/nmrih/cfg/server.cfg
+    kubectl exec -n games <pod name> -- chown nmrih:nmrih /home/nmrih/server/nmrih/cfg/server.cfg
+
+The server.cfg is executed on every map start, so you don't need to restart the container after a change.  
+Please don't set "sv_password" or "rcon_password" in the server.cfg, if you use the secrets or the variables (check the [RCON and server password](#rcon-and-server-password) section).
 
 #### SFTP Usage
 
@@ -238,6 +262,7 @@ If you have any problems with the image, please don't hesitate to contact me or 
 #### Useful Links
 
 ---
+* GitHub repository: https://github.com/dringewald/docker-nmrih-server/
 * GitLab repository: https://gitlab.holydev.net/gameserver/docker-nmrih-server/
 * Discord: https://discord.gg/jymDumdFVU 
 * Steam documentation: https://developer.valvesoftware.com/wiki/Source_Dedicated_Server
@@ -287,4 +312,24 @@ If you have any problems with the image, please don't hesitate to contact me or 
     ```
     Since Ubuntu 24.04 this library is not available anymore.  
     The image adds the Ubuntu 22.04 repository and only installs libtinfo5 from it. All other packages are still installed from Ubuntu 26.04.  
-    You can find the settings for this in the files files/apt/jammy.sources and files/apt/jammy.pref in the [GitLab repository](#useful-links).
+    You can find the settings for this in the files files/apt/jammy.sources and files/apt/jammy.pref in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).
+
+5. With the update from 13.09.2026 the image supports secrets for the passwords (check the [RCON and server password](#rcon-and-server-password) section).  
+    If you used the image in Kubernetes before and now mount the secrets into /run/secrets, the pod may not start anymore.  
+    The pod shows the status "RunContainerError" and the log of the container is empty.
+    ```
+    NAME                    READY   STATUS              RESTARTS      AGE
+    nmrih-7cc765c89-wpx7l   0/1     RunContainerError   3 (19s ago)   78s
+    ```
+    With "kubectl describe pod" you will find an error with "read-only file system" in the events.  
+    The reason is that /var/run is a link to /run in the container. Kubernetes tries to mount the service account token into /var/run/secrets/kubernetes.io/serviceaccount, which is inside the read-only secret.  
+    The gameserver doesn't need access to the Kubernetes API, so just add the following line to the spec of the pod in your deployment:
+    ```
+    automountServiceAccountToken: false
+    ```
+    You could also change your running deployment with the following command:
+    ```
+    kubectl patch deployment nmrih -n games -p '{"spec":{"template":{"spec":{"automountServiceAccountToken":false}}}}'
+    ```
+    The kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/) already contains this setting.  
+    If you don't mount the secrets into /run/secrets, nothing needs to be changed.

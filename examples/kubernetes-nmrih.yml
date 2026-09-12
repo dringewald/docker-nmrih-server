@@ -47,6 +47,10 @@ spec:
     spec:
       # Time the server gets to shut down gracefully before it is killed
       terminationGracePeriodSeconds: 60
+      # The server doesn't need access to the Kubernetes API
+      # This is also needed because of the secret in /run/secrets: /var/run is a link to /run,
+      # so the service account token (/var/run/secrets/kubernetes.io) can't be mounted into the read-only secret
+      automountServiceAccountToken: false
       containers:
       - name: nmrih
         image: holt31/nmrih-server:latest
