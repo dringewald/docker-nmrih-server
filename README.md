@@ -264,9 +264,9 @@ If you have any problems with the image, please don't hesitate to contact me or 
 ---
 * GitHub repository: https://github.com/dringewald/docker-nmrih-server/
 * GitLab repository: https://gitlab.holydev.net/gameserver/docker-nmrih-server/
+* Docker Hub: https://hub.docker.com/r/holt31/nmrih-server
 * Discord: https://discord.gg/jymDumdFVU 
 * Steam documentation: https://developer.valvesoftware.com/wiki/Source_Dedicated_Server
-* Docker Hub: https://hub.docker.com/repository/docker/holt31/nmrih-server/
 * No More Room in Hell Steam page: https://store.steampowered.com/app/224260/No_More_Room_in_Hell/
 * Game Server Login Token (GSLT) Page: https://steamcommunity.com/dev/managegameservers
 
