@@ -1,6 +1,21 @@
 # No More Room in Hell - Docker Image
 This image provides a fully functional No More Room in Hell Server.
 
+[![DockerHub](https://img.shields.io/badge/Docker-Hub-2496ED?logo=docker)](https://hub.docker.com/r/holt31/nmrih-server)
+[![Docker Pulls](https://img.shields.io/docker/pulls/holt31/nmrih-server?label=Pulls&color=2496ED&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik01LDIwSDE5VjE4SDVNMTksOUgxNVYzSDlWOUg1TDEyLDE2TDE5LDlaIi8+PC9zdmc+)](https://hub.docker.com/r/holt31/nmrih-server)
+[![Image Size](https://img.shields.io/docker/image-size/holt31/nmrih-server/latest?label=Image%20Size&color=2496ED&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwzQzcuNTgsMyA0LDQuNzkgNCw3QzQsOS4yMSA3LjU4LDExIDEyLDExQzE2LjQyLDExIDIwLDkuMjEgMjAsN0MyMCw0Ljc5IDE2LjQyLDMgMTIsM000LDlWMTJDNCwxNC4yMSA3LjU4LDE2IDEyLDE2QzE2LjQyLDE2IDIwLDE0LjIxIDIwLDEyVjlDMjAsMTEuMjEgMTYuNDIsMTMgMTIsMTNDNy41OCwxMyA0LDExLjIxIDQsOU00LDE0VjE3QzQsMTkuMjEgNy41OCwyMSAxMiwyMUMxNi40MiwyMSAyMCwxOS4yMSAyMCwxN1YxNEMyMCwxNi4yMSAxNi40MiwxOCAxMiwxOEM3LjU4LDE4IDQsMTYuMjEgNCwxNFoiLz48L3N2Zz4=)](https://hub.docker.com/r/holt31/nmrih-server/tags)
+[![Last Commit](https://img.shields.io/github/last-commit/dringewald/docker-nmrih-server?logo=github)](https://github.com/dringewald/docker-nmrih-server/commits/master)<br/>
+[![Created with VSCodium](https://img.shields.io/badge/Created%20with-VSCodium-2F80ED?logo=vscodium)](https://vscodium.com/)
+[![Ubuntu 26.04](https://img.shields.io/badge/Ubuntu-26.04%20LTS-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Kubernetes ready](https://img.shields.io/badge/Kubernetes-ready-326CE5?logo=kubernetes&logoColor=white)](https://github.com/dringewald/docker-nmrih-server/tree/master/examples)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwzQzEwLjczLDMgOS42LDMuOCA5LjE4LDVIM1Y3SDQuOTVMMiwxNEMxLjUzLDE2IDMsMTcgNS41LDE3QzgsMTcgOS41NiwxNiA5LDE0TDYuMDUsN0g5LjE3QzkuNSw3Ljg1IDEwLjE1LDguNSAxMSw4LjgzVjIwSDJWMjJIMjJWMjBIMTNWOC44MkMxMy44NSw4LjUgMTQuNSw3Ljg1IDE0LjgyLDdIMTcuOTVMMTUsMTRDMTQuNTMsMTYgMTYsMTcgMTguNSwxN0MyMSwxNyAyMi41NiwxNiAyMiwxNEwxOS4wNSw3SDIxVjVIMTQuODNDMTQuNCwzLjggMTMuMjcsMyAxMiwzTTEyLDVBMSwxIDAgMCwxIDEzLDZBMSwxIDAgMCwxIDEyLDdBMSwxIDAgMCwxIDExLDZBMSwxIDAgMCwxIDEyLDVNNS41LDEwLjI1TDcsMTRINEw1LjUsMTAuMjVNMTguNSwxMC4yNUwyMCwxNEgxN0wxOC41LDEwLjI1WiIvPjwvc3ZnPg==)](https://github.com/dringewald/docker-nmrih-server/blob/master/LICENCE)
+<br/>
+[![Donate on PayPal](https://img.shields.io/badge/Donate-PayPal-0070ba?logo=paypal)](https://www.paypal.com/paypalme/NoXHolt)
+[![Steam Store](https://img.shields.io/badge/Steam_Store-NMRiH-000000?logo=steam)](https://store.steampowered.com/app/224260/No_More_Room_in_Hell/)
+[![Join us on Discord](https://img.shields.io/badge/Discord-Join%20Now-5865F2?logo=discord)](https://discord.gg/jymDumdFVU)
+[![Steam Profile](https://img.shields.io/badge/Steam-View%20Profile-000000?logo=steam)](https://steamcommunity.com/id/nox_holt)
+
+## Features
 * Built on the secure Ubuntu Linux distribution (Ubuntu 26.04 LTS)
 * Uses the latest optimizations for the best performance, low CPU usage & memory footprint
 * Optimized for multiple concurrent users
@@ -11,7 +26,7 @@ This image provides a fully functional No More Room in Hell Server.
 * Follows the KISS principle (Keep It Simple, Stupid) to make it easy to understand and adjust the image to your needs
 * Optimized to be run as a single pod in a kubernetes cluster
 
-You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).
+>You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).
 
 ## Goal of this project
 The goal of this container image is to provide an easy to run No More Room in Hell gameserver in a container which follows the best practices.
