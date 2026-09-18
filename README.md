@@ -25,6 +25,7 @@ This image provides a fully functional No More Room in Hell Server.
 * The gameserver shuts down gracefully when the container is stopped
 * Follows the KISS principle (Keep It Simple, Stupid) to make it easy to understand and adjust the image to your needs
 * Optimized to be run as a single pod in a kubernetes cluster
+* Autoupdated weekly to ensure staying on the latest packages
 
 >You can find a docker-compose.yml and a kubernetes-nmrih.yml in the [GitHub repository](https://github.com/dringewald/docker-nmrih-server/).
 
